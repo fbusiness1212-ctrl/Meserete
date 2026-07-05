@@ -219,14 +219,21 @@ function editMember(index) {
     openFolder('newRegistrationFolder');
 }
 
-// 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ)
+// 🧮 የዕድሜ ስሌት (የአሁኑን የኢትዮጵያ ዓመተ ምህረት 2018 መነሻ በማድረግ በራስ-ሰር ያሰላል)
 function calculateAge() {
-    let year = document.getElementById("birthYear").value;
-    if(year) {
-        document.getElementById("mAge").value = 2026 - parseInt(year);
+    let yearInput = document.getElementById("birthYear").value;
+    if(yearInput) {
+        let currentEthiopianYear = 2018; // አሁን ያለንበት የኢትዮጵያ ዓመተ ምህረት
+        let age = currentEthiopianYear - parseInt(yearInput);
+        
+        // ዕድሜው ከዜሮ በታች እንዳይሆን መቆጣጠሪያ
+        if(age >= 0) {
+            document.getElementById("mAge").value = age;
+        } else {
+            document.getElementById("mAge").value = "";
+        }
     }
 }
-
 function resetForm() {
     document.getElementById("editIndex").value = "-1";
     document.getElementById("mName").value = "";
