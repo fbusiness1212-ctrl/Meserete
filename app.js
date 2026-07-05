@@ -445,10 +445,11 @@ function editMember(index) {
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
-        // 🇪🇹 የፈረንጆቹን ዓመት (Gregorian Year) ወደ ኢትዮጵያ ዓመተ ምህረት በራስ-ሰር መቀየሪያ ስሌት
+        // 🇪🇹 የአሁኑን የፈረንጆች ዓመት አይቶ በራሱ ጊዜ ወደ ወቅታዊው የኢትዮጵያ ዓመተ ምህረት ይቀይራል (ለምሳሌ፡ 2026 - 8 = 2018)
         let gregorianYear = new Date().getFullYear(); 
-        let currentEthiopianYear = gregorianYear - 8; // ለምሳሌ፡ 2026 - 8 = 2018 ዓ.ም ይሆናል
+        let currentEthiopianYear = gregorianYear - 8; 
         
+        // 🎯 የኢትዮጵያ ዓመት - የገባው የትውልድ ዓመት (ለምሳሌ፡ 2018 - 2000 = 18 ያደርገዋል)
         let age = currentEthiopianYear - parseInt(yearInput);
         
         if(age >= 0) {
