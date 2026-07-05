@@ -1,14 +1,26 @@
 // 🔐 የአድሚን መግቢያ ማረጋገጫ (Login)
 function checkLogin() {
-    var user = document.getElementById("adminUsername").value.trim();
-    var pass = document.getElementById("adminPassword").value.trim();
+    console.log("Login function started..."); // ኮዱ መሥራቱን በጀርባ ለማረጋገጥ
     
-    if (user === "Meserete-Hywet" && pass === "2116") {
+    var userField = document.getElementById("adminUsername");
+    var passField = document.getElementById("adminPassword");
+    
+    if (!userField || !passField) {
+        alert("የቴክኒክ ስህተት፡ የግብዓት ሳጥኖቹ አልተገኙም!");
+        return;
+    }
+    
+    var user = userField.value.trim();
+    var pass = passField.value.trim();
+    
+    if (user === "admin" && pass === "1234") {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
         
-        // 📥 በተሳካ ሁኔታ Login ካደረገ በኋላ ብቻ ዳታቤዙን እንዲያነብ ማድረግ
-        fetchMembersFromFirebase(); 
+        // ዳታቤዝ ለመሳብ ከመሞከሩ በፊት ገጹ መከፈቱን ለማረጋገጥ
+        setTimeout(function() {
+            fetchMembersFromFirebase();
+        }, 200);
     } else {
         alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
@@ -45,7 +57,6 @@ function fetchMembersFromFirebase() {
     })
     .catch(error => {
         console.error("ዳታቤዝ ማንበብ አልተቻለም፦", error);
-        // ዳታቤዙ ባዶ ቢሆን እንኳ ገጹ እንዳይቆም ዝርዝሩን ባዶ አድርጎ ያሳያል
         renderMembers(); 
     });
 }
@@ -219,7 +230,7 @@ function editMember(index) {
     openFolder('newRegistrationFolder');
 }
 
-// 🧮 የዕድሜ ስሌት (የአሁኑን የኢትዮጵያ ዓመተ ምህረት 2018 መነሻ በማድረግ በራስ-ሰር ያሰላል)
+// 🧮 የዕድሜ ስሌት
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
