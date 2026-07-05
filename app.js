@@ -44,7 +44,32 @@ function handleLogout() {
     document.querySelectorAll('.file-view').forEach(view => view.style.display = 'none');
     document.getElementById('lockScreen').style.display = 'block';
 }
+// 🌐 የ Firebase ዳታቤዝ አድራሻ
+const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
 
+// 📂 የአባላት መረጃዎችን ለመያዝ
+let members = [];
+
+// 📥 መረጃዎችን ከ Firebase ዳታቤዝ ማውረጃ ፈንክሽን
+function fetchMembersFromFirebase() {
+    fetch(`${FIREBASE_URL}/members.json`)
+    .then(response => response.json())
+    .then(data => {
+        members = [];
+        if (data) {
+            Object.keys(data).forEach(key => {
+                let member = data[key];
+                member.firebaseKey = key; 
+                members.push(member);
+            });
+        }
+        renderMembers();
+    })
+    .catch(error => {
+        console.error("ዳታቤዝ ማንበብ አልተቻለም፦", error);
+        renderMembers(); 
+    });
+}
 // 📅 በየዓመቱ ዕድሜን በራስ-ሰር ማስያዣ ፈንክሽን
 function calculateAge() {
     let birthYear = parseInt(document.getElementById('birthYear').value) || 1995;
