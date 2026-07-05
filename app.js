@@ -2,8 +2,8 @@ let members = JSON.parse(localStorage.getItem('mahber_members')) || [];
 let tsiwas = JSON.parse(localStorage.getItem('mahber_tsiwas')) || [];
 
 // 🔐 የአድሚን መግቢያ መረጃዎች
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "1234";
+const ADMIN_USER = "Mahber";
+const ADMIN_PASS = "2116";
 let activeModalIndex = -1;
 let editTsiwaIndex = -1;
 
