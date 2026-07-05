@@ -1,4 +1,4 @@
-// 🔐 የአድሚን መግቢያ ማረጋገጫ
+8// 🔐 የአድሚን መግቢያ ማረጋገጫ
 function checkLogin() {
     var user = document.getElementById("adminUsername").value;
     var pass = document.getElementById("adminPassword").value;
@@ -481,25 +481,57 @@ function resetForm() {
     document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
 }
 window.addEventListener('DOMContentLoaded', () => {
+    let dSel = document.getElementById('ethDay');
+    let mSel = document.getElementById('ethMonth');
+    let ySel = document.getElementById('ethYear');
+
     let bdSel = document.getElementById('birthDay');
     let bmSel = document.getElementById('birthMonth');
     let bySel = document.getElementById('birthYear');
-    let qd = document.getElementById('qDay');
-    let qm = document.getElementById('qMonth');
-    let qy = document.getElementById('qYear');
+
+    let qDaySel = document.getElementById('qDay');
+    let qMonthSel = document.getElementById('qMonth');
+    let qYearSel = document.getElementById('qYear');
+
     let months = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜን"];
 
-    for(let i=1; i<=30; i++) { bdSel.innerHTML += `<option value="${i}">${i}</option>`; qd.innerHTML += `<option value="${i}">${i}</option>`; }
-    months.forEach(m => { bmSel.innerHTML += `<option value="${m}">${m}</option>`; qm.innerHTML += `<option value="${m}">${m}</option>`; });
+    for(let i=1; i<=30; i++) {
+        if(dSel) dSel.innerHTML += `<option value="${i}">${i}</option>`;
+        if(bdSel) bdSel.innerHTML += `<option value="${i}">${i}</option>`;
+        if(qDaySel) qDaySel.innerHTML += `<option value="${i}">${i}</option>`;
+    }
+
+    months.forEach(m => {
+        if(mSel) mSel.innerHTML += `<option value="${m}">${m}</option>`;
+        if(bmSel) bmSel.innerHTML += `<option value="${m}">${m}</option>`;
+        if(qMonthSel) qMonthSel.innerHTML += `<option value="${m}">${m}</option>`;
+    });
+
+    let currentEthYear = new Date().getFullYear() - 8; // 2018 ዓ.ም
+
+    if(bySel) {
+        bySel.innerHTML = "";
+        for(let y=1950; y<=currentEthYear; y++) {
+            bySel.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+    }
+
+    if(ySel) {
+        ySel.innerHTML = "";
+        for(let y=2000; y<=(currentEthYear + 10); y++) {
+            ySel.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+    }
+    if(qYearSel) {
+        qYearSel.innerHTML = "";
+        for(let y=2010; y<=currentEthYear; y++) {
+            qYearSel.innerHTML += `<option value="${y}">${y}</option>`;
+        }
+    }
+
+    if(bySel) bySel.value = "2000"; // ገጹ ሲከፈት መጀመሪያ 2000 ላይ እንዲቆም
+    if(qYearSel) qYearSel.value = currentEthYear.toString();
+    if(ySel) ySel.value = currentEthYear.toString();
     
-    // 🔄 አውቶማቲክ የአሁኑን የኢትዮጵያ ዓመት መነሻ በማድረግ ምርጫዎችን መሙላት
-    let currentEthYear = new Date().getFullYear() - 8; 
-    
-    // የትውልድ ዓመት ምርጫ ከ1950 ጀምሮ እስከ አሁኑ የኢትዮጵያ ዓመት (2018) ድረስ ብቻ ያሳያል
-    for(let y=1950; y<=currentEthYear; y++) { bySel.innerHTML += `<option value="${y}">${y}</option>`; }
-    // የቁርባን ዓመት ምርጫ ከ2010 ጀምሮ እስከ አሁኑ የኢትዮጵያ ዓመት (2018) ድረስ ያሳያል
-    for(let y=2010; y<=currentEthYear; y++) { qy.innerHTML += `<option value="${y}">${y}</option>`; }
-    
-    bySel.value = "1995";
-    calculateAge();
+    calculateAge(); // ዕድሜውን ወዲያውኑ 18 ብሎ እንዲያስጀምረው
 });
