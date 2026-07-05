@@ -37,9 +37,6 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #1a2a3a; color: white; }
         
-        /* 🔴 የ3 ወር ማስጠንቀቂያ ቀይ ረድፍ ስታይል */
-        .danger-row { background-color: #ffebee !important; color: #c62828 !important; font-weight: bold; border: 2px solid #ef5350; }
-        
         .btn-block { background: #2e7d32; color: white; padding: 12px; width: 100%; border: none; font-weight: bold; border-radius: 4px; font-size: 14px; cursor: pointer; margin-top: 10px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; width: 90%; max-width: 500px; padding: 20px; border-radius: 8px; max-height: 85vh; overflow-y: auto; }
@@ -54,7 +51,6 @@
 
     <div class="container">
         
-        <!-- 🔐 አዲሱ የ Admin መግቢያ ፎርም -->
         <div id="lockScreen">
             <div style="font-size: 45px; margin-bottom: 5px;">💻</div>
             <h3 style="margin: 0 0 5px 0; color: #1a2a3a;">የአድሚን መግቢያ ገጽ</h3>
@@ -67,7 +63,6 @@
         </div>
 
         <div id="mainDashboard" style="display: none;">
-            <!-- 🚪 የመውጫ (Logout) ቁልፍ -->
             <div style="text-align: right; margin-bottom: 10px;">
                 <button onclick="handleLogout()" style="background:#c62828; color:white; border:none; padding:5px 12px; font-size:12px; font-weight:bold; border-radius:4px; cursor:pointer;">🔒 ውጣ (Logout)</button>
             </div>
@@ -91,7 +86,7 @@
         <div id="viewMembersFolder" class="file-view">
             <button class="back-btn" onclick="goBack()">⬅ ወደ ፎልደሮች ተመለስ</button>
             <h3 style="margin-top:0; color:#1a2a3a; font-size:15px;">📂 መዝገብ ፎልደር > የአባላት ፋይሎች</h3>
-            <p style="font-size:11px; color:#c62828; margin:0 0 10px 0;">⚠️ ማሳሰቢያ፦ የቁርባን ክትትል በየወሩ ከ3 ወር በላይ የዘገየባቸው አባላት በነጠላ ቀይ ቀለም ይደምቃሉ።</p>
+            <p style="font-size:11px; color:#c62828; margin:0 0 10px 0;">⚠️ ማሳሰቢያ፦ የቁርባን ክትትል ከ3 ወር በላይ የዘገየባቸው አባላት ሙሉ መስመራቸው በቀይ ቀለም ይደምቃል።</p>
             <input type="text" id="search" oninput="searchMember()" placeholder="በስም ወይም በስልክ ፈልግ..." style="width:100%; padding:9px; border:2px solid #d4af37; border-radius:4px; box-sizing:border-box; margin-bottom:10px;">
             <div style="overflow-x: auto;">
                 <table>
@@ -100,7 +95,7 @@
                             <th>ተ.ቁ</th>
                             <th>ሙሉ ስም</th>
                             <th>ስልክ ቁጥር</th>
-                            <th>ዕድሜ</th>
+                            <th>የቅዱስ ቁርባን ሁኔታ</th>
                             <th>ክትትል / ፋይል</th>
                         </tr>
                     </thead>
@@ -173,177 +168,4 @@
                     <select id="mBlood" class="input-field">
                         <option value="ያልታወቀ">-- ይምረጡ --</option>
                         <option value="A+">A+</option><option value="A-">A-</option>
-                        <option value="B+">B+</option><option value="B-">B-</option>
-                        <option value="O+">O+</option><option value="O-">O-</option>
-                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                    </select>
-                </div>
-
-                <div class="row">
-                    <div class="label">የቅዱስ ቁርባን ሁኔታ:</div>
-                    <select id="mQurbanStatus" class="input-field">
-                        <option value="በቅዱስ ቁርባን ያለ">በቅዱስ ቁርባን ያለ</option>
-                        <option value="ከቆረበ ቆይቷል">ከቆረበ ቆይቷል</option>
-                    </select>
-                </div>
-                <div class="row">
-                    <div class="label">የመጨረሻ የቆረበበት ቀን:</div>
-                    <div style="width:60%; display:flex; gap:3px;">
-                        <select id="qDay" class="input-field" style="width:25%;"><option value="ቀን">ቀን</option></select>
-                        <select id="qMonth" class="input-field" style="width:45%;"><option value="ወር">ወር</option></select>
-                        <select id="qYear" class="input-field" style="width:30%;"><option value="ዓመት">ዓመት</option></select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section" style="border-left-color: #00897b;">
-                <div class="form-title" style="color: #00897b;">ክፍል ፪፡ የሥራና የመኖሪያ አድራሻ መረጃ</div>
-                <div class="row">
-                    <div class="label">የሥራ ሁኔታ:</div>
-                    <select id="mJobStatus" class="input-field">
-                        <option value="">-- ይምረጡ --</option>
-                        <option value="ተማሪ">ተማሪ</option>
-                        <option value="የመንግሥት ሠራተኛ">የመንግሥት ሠራተኛ</option>
-                        <option value="የግል ሠራተኛ">የግል ሠራተኛ</option>
-                        <option value="የንግድ ሥራ">የንግድ ሥራ</option>
-                    </select>
-                </div>
-                <div class="row"><div class="label">ስልክ ቁጥር:</div><input type="tel" id="mPhone" class="input-field"></div>
-                <div class="row"><div class="label">ክፍለ ከተማ:</div>
-                    <select id="mLoc" class="input-field">
-                        <option value="">-- ይምረጡ --</option>
-                        <option value="ቦሌ">ቦሌ</option><option value="የካ">የካ</option><option value="ንፋስ ስልክ ላፍቶ">ንፋስ ስልክ ላፍቶ</option><option value="ኮልፌ ቀራንዮ">ኮልፌ ቀራንዮ</option><option value="ለሚ ኩራ">ለሚ ኩራ</option><option value="ቂርቆስ">ቂርቆስ</option><option value="ጉለሌ">ጉለሌ</option><option value="አራዳ">አራዳ</option><option value="አዲስ ከተማ">አዲስ ከተማ</option><option value="ልደታ">ልደታ</option><option value="አቃቂ ቃሊቲ">አቃቂ ቃሊቲ</option>
-                    </select>
-                </div>
-                <div class="row"><div class="label">ወረዳ:</div><input type="text" id="mWereda" class="input-field"></div>
-                <div class="row"><div class="label">የቤት ቁጥር:</div><input type="text" id="mHouseNum" class="input-field"></div>
-                <div class="row"><div class="label">የሰፈር ልዩ ስም / ዞን:</div><input type="text" id="mSeferName" class="input-field"></div>
-                <div class="row"><div class="label">ቋሚ መኖሪያ (Location):</div><input type="text" id="mMapLoc" class="input-field"></div>
-            </div>
-
-            <div class="form-section" style="border-left-color: #ffa000;">
-                <div class="form-title" style="color: #ffa000;">ክፍል ፫፡ የሃይማኖት አባት እና ትምህርት</div>
-                <div class="row"><div class="label">የንስሐ አባት ስም:</div><input type="text" id="mGodName" class="input-field"></div>
-                <div class="row"><div class="label">የንስሐ አባት ስልክ ቁጥር:</div><input type="tel" id="mGodPhone" class="input-field"></div>
-                <div class="row"><div class="label">የትምህርት ደረጃ:</div><input type="text" id="mEdu" class="input-field"></div>
-            </div>
-
-            <div class="form-section" style="border-left-color: #e91e63;">
-                <div class="form-title" style="color: #e91e63;">ክፍል ፬፡ የድንገተኛ አደጋ ተጠሪ መረጃ</div>
-                <div class="row"><div class="label">የተጠሪ ሙሉ ስም:</div><input type="text" id="mFamName" class="input-field"></div>
-                <div class="row"><div class="label">የተጠሪ ክርስትና ስም:</div><input type="text" id="mFamChrist" class="input-field"></div>
-                <div class="row"><div class="label">የተጠሪ ስልክ ቁጥር:</div><input type="tel" id="mFamPhone" class="input-field"></div>
-                <div class="row"><div class="label">ከአባሉ ጋር ያለው ዝምድና:</div><input type="text" id="mRelation" class="input-field"></div>
-            </div>
-
-            <div class="form-section" style="border-left-color: #3f51b5;">
-                <div class="form-title" style="color: #3f51b5;">ክፍል ፭፡ የቤተሰብ ሁኔታ መረጃ</div>
-                <div class="row"><div class="label">የአባት ሙሉ ስም:</div><input type="text" id="mFatherName" class="input-field"></div>
-                <div class="row"><div class="label">የአባት ክርስትና ስም:</div><input type="text" id="mFatherChrist" class="input-field"></div>
-                <div class="row"><div class="label">የአባት ስልክ ቁጥር:</div><input type="tel" id="mFatherPhone" class="input-field"></div>
-                <div class="row">
-                    <div class="label">የሥራ ሁኔታ:</div>
-                    <select id="mJobStatus" class="input-field">
-                        <option value="">-- ይምረጡ --</option>
-                        <option value="የመንግሥት ሠራተኛ">የመንግሥት ሠራተኛ</option>
-                        <option value="የግል ሠራተኛ">የግል ሠራተኛ</option>
-                        <option value="የንግድ ሥራ">የንግድ ሥራ</option>
-                    </select>
-                </div>
-                <div style="border-top:1px dashed #ccc; margin:8px 0;"></div>
-                <div class="row"><div class="label">የእናት ሙሉ ስም:</div><input type="text" id="mMotherName" class="input-field"></div>
-                <div class="row"><div class="label">የእናት ክርስትና ስም:</div><input type="text" id="mMotherChrist" class="input-field"></div>
-                <div class="row"><div class="label">የእናት ስልክ ቁጥር:</div><input type="tel" id="mMotherPhone" class="input-field"></div>
-                <div class="row">
-                    <div class="label">የሥራ ሁኔታ:</div>
-                    <select id="mJobStatus" class="input-field">
-                        <option value="">-- ይምረጡ --</option>
-                        <option value="የመንግሥት ሠራተኛ">የመንግሥት ሠራተኛ</option>
-                        <option value="የግል ሠራተኛ">የግል ሠራተኛ</option>
-                        <option value="የንግድ ሥራ">የንግድ ሥራ</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-section" style="border-left-color: #795548;">
-                <div class="form-title" style="color: #795548;">ክፍል ፮፡ ምርመራ (ተጨማሪ ማስታወሻ)</div>
-                <textarea id="mNotes" rows="4" placeholder="ስለ አባሉ ማንኛውንም አይነት ተጨማሪ መረጃ ወይም የባህሪ ክትትል እዚህ መጻፍ ይችላሉ..." style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px; font-size:13px; box-sizing:border-box; font-family:sans-serif;"></textarea>
-            </div>
-
-            <button onclick="addMember()" id="submitBtn" class="btn-block">💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ</button>
-        </div>
-
-    </div>
-
-    <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0; border-bottom:2px solid #d4af37; padding-bottom:5px; color:#1a2a3a;">📜 የአባል ሙሉ ማኅደር ፋይል</h3>
-            <div id="profileContent" style="font-size:13px; line-height:1.6; white-space:pre-wrap;"></div>
-            
-            <div style="background:#f5f5f5; padding:12px; border-radius:5px; margin:15px 0; border:1px solid #ddd;">
-                <h4 style="margin:0 0 5px 0; color:#2e7d32;">🗓️ የወርሃዊ ቁርባን ክትትል መቆጣጠሪያ</h4>
-                <label style="font-weight:bold; display:flex; align-items:center; gap:8px; cursor:pointer;">
-                    <input type="checkbox" id="modalQurbanCheck" style="width:18px; height:18px;" onchange="toggleMonthlyQurban()"> የዚህ ወር (የአሁኑ ወር) ቁርባን ተፈጽሟል
-                </label>
-                <p id="modalLastUpdatedText" style="margin:5px 0 0 0; font-size:11px; color:gray;"></p>
-            </div>
-
-            <div style="display:flex; gap:10px; margin-top:15px;">
-                <button id="modalEditBtn" style="flex:1; background:#ffa000; color:white; border:none; padding:10px; font-weight:bold; border-radius:4px; cursor:pointer;">✏️ ፋይል አሻሽል (Edit)</button>
-                <button onclick="closeProfile()" style="flex:1; background:#e0e0e0; color:black; border:none; padding:10px; font-weight:bold; border-radius:4px; cursor:pointer;">ዝጋ</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="app.js"></script>
-    <script>
-        function openFolder(folderId) {
-            document.getElementById('mainDashboard').style.display = 'none';
-            document.querySelectorAll('.file-view').forEach(view => view.style.display = 'none');
-            document.getElementById(folderId).style.display = 'block';
-            if(folderId === 'newRegistrationFolder' && document.getElementById('editIndex').value === "-1") {
-                resetForm();
-            }
-        }
-        function goBack() {
-            document.querySelectorAll('.file-view').forEach(view => view.style.display = 'none');
-            document.getElementById('mainDashboard').style.display = 'block';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let dSel = document.getElementById('ethDay');
-            let mSel = document.getElementById('ethMonth');
-            let ySel = document.getElementById('ethYear');
-            
-            let bdSel = document.getElementById('birthDay');
-            let bmSel = document.getElementById('birthMonth');
-            let bySel = document.getElementById('birthYear');
-
-            let qDaySel = document.getElementById('qDay');
-            let qMonthSel = document.getElementById('qMonth');
-            let qYearSel = document.getElementById('qYear');
-
-            let months = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜን"];
-
-            for(let i=1; i<=30; i++) { 
-                dSel.innerHTML += `<option value="${i}">${i}</option>`; 
-                bdSel.innerHTML += `<option value="${i}">${i}</option>`;
-                qDaySel.innerHTML += `<option value="${i}">${i}</option>`;
-            }
-            
-            months.forEach(m => { 
-                mSel.innerHTML += `<option value="${m}">${m}</option>`; 
-                bmSel.innerHTML += `<option value="${m}">${m}</option>`;
-                qMonthSel.innerHTML += `<option value="${m}">${m}</option>`;
-            });
-            
-            for(let y=1950; y<=2026; y++) { bdSel.innerHTML += `<option value="${y}">${y}</option>`; bySel.innerHTML += `<option value="${y}">${y}</option>`; }
-            for(let y=2000; y<=2035; y++) { ySel.innerHTML += `<option value="${y}">${y}</option>`; qYearSel.innerHTML += `<option value="${y}">${y}</option>`; }
-            
-            bySel.value = "1995";
-            qYearSel.value = "2018";
-            ySel.value = "2018";
-            calculateAge();
-        });
-    </script>
-</body>
-</html>
+                        <option value="B+">B+</option><option value="B-">B-
