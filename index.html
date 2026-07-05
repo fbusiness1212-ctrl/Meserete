@@ -9,24 +9,20 @@
         .header { background: #1a2a3a; color: white; text-align: center; padding: 15px; border-bottom: 4px solid #d4af37; }
         .container { padding: 15px; max-width: 650px; margin: auto; }
         
-        /* 🔒 አዲሱ የAdmin መግቢያ (Login Screen) ስታይል */
         #lockScreen { text-align: center; margin-top: 40px; padding: 25px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 360px; margin-left: auto; margin-right: auto; border-top: 5px solid #d4af37; }
         .login-input { width: 100%; padding: 11px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
         .login-btn { background: #1a2a3a; color: white; padding: 11px; width: 100%; border: none; font-weight: bold; border-radius: 4px; font-size: 14px; cursor: pointer; margin-top: 10px; transition: background 0.2s; }
         .login-btn:hover { background: #243b55; }
         
-        /* የፎልደር ስታይል */
         .folder-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
         .folder { background: white; padding: 20px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; cursor: pointer; border: 1px solid #e0e0e0; transition: transform 0.2s; }
         .folder:active { transform: scale(0.95); background: #f7f7f7; }
         .folder-icon { font-size: 45px; color: #ffa000; margin-bottom: 8px; }
         .folder-name { font-weight: bold; color: #1a2a3a; font-size: 14px; }
         
-        /* የፋይል ገጾች */
         .file-view { display: none; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 10px; }
         .back-btn { background: #e0e0e0; border: none; padding: 8px 15px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; }
         
-        /* የፎርም አቀማመጥ */
         .form-section { background: #f9fbfd; padding: 12px; border-radius: 6px; border-left: 4px solid #2e7d32; margin-bottom: 15px; }
         .form-title { font-weight: bold; color: #2e7d32; font-size: 13px; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 3px; }
         .row { display: flex; align-items: center; margin-bottom: 8px; }
@@ -51,6 +47,7 @@
 
     <div class="container">
         
+        <!-- 🔐 የ Admin መግቢያ ፎርም -->
         <div id="lockScreen">
             <div style="font-size: 45px; margin-bottom: 5px;">💻</div>
             <h3 style="margin: 0 0 5px 0; color: #1a2a3a;">የአድሚን መግቢያ ገጽ</h3>
@@ -104,37 +101,11 @@
             </div>
         </div>
 
+        <!-- የፅዋ ፎልደር -->
         <div id="viewTsiwaFolder" class="file-view">
             <button class="back-btn" onclick="goBack()">⬅ ወደ ፎልደሮች ተመለስ</button>
-            <h3 style="margin-top:0; color:#1a2a3a; font-size:15px;">📂 መዝገብ ፎልደር > የፅዋ ዕጣዎች (ሴንተሬዝ)</h3>
-            <div style="background:#f9f9f9; padding:10px; border-radius:5px; margin-bottom:15px; border:1px solid #ddd;">
-                <h4 id="tsiwaFormTitle" style="margin:0 0 8px 0; font-size:12px; color:#333;">[+] አዲስ የፅዋ ዕጣ መዝግብ</h4>
-                <div class="row"><div class="label">የፅዋው ስም:</div><input type="text" id="tName" placeholder="ማርያም..." class="input-field"></div>
-                <div class="row"><div class="label">የአባሉ ስም:</div><input type="text" id="tMember" class="input-field"></div>
-                <div class="row">
-                    <div class="label">የመዘከሪያ ቀን (ኢትዮጵያ):</div>
-                    <div style="width:60%; display:flex; gap:4px;">
-                        <select id="ethDay" class="input-field" style="width:30%;"></select>
-                        <select id="ethMonth" class="input-field" style="width:45%;"></select>
-                        <select id="ethYear" class="input-field" style="width:25%;"></select>
-                    </div>
-                </div>
-                <button id="tsiwaSubmitBtn" onclick="addTsiwa()" style="background:#1a2a3a; color:white; padding:7px; width:100%; border:none; font-weight:bold; border-radius:4px; cursor:pointer; font-size:12px; margin-top:5px;">ፅዋ መዝግብ</button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ተ.ቁ</th>
-                            <th>የፅዋው ስም</th>
-                            <th>የአባሉ ስም</th>
-                            <th>የመዘከሪያ ቀን (በኢትዮጵያ)</th>
-                            <th style="text-align: center;">ድርጊት / ሁኔታ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tsiwaTableBody"></tbody>
-                </table>
-            </div>
+            <h3 style="margin-top:0; color:#1a2a3a; font-size:15px;">📂 መዝገብ ፎልደር > የፅዋ ዕጣዎች</h3>
+            <p style="font-size:12px; color:gray;">የፅዋ መረጃዎች በቅርቡ ይዘምናሉ...</p>
         </div>
 
         <div id="newRegistrationFolder" class="file-view">
@@ -168,4 +139,247 @@
                     <select id="mBlood" class="input-field">
                         <option value="ያልታወቀ">-- ይምረጡ --</option>
                         <option value="A+">A+</option><option value="A-">A-</option>
-                        <option value="B+">B+</option><option value="B-">B-
+                        <option value="B+">B+</option><option value="B-">B-</option>
+                        <option value="O+">O+</option><option value="O-">O-</option>
+                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="label">የቅዱስ ቁርባን ሁኔታ:</div>
+                    <select id="mQurbanStatus" class="input-field">
+                        <option value="በቅዱስ ቁርባን ያለ">በቅዱስ ቁርባን ያለ</option>
+                        <option value="ከቆረበ ቆይቷል">ከቆረበ ቆይቷል</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="label">የመጨረሻ የቆረበበት ቀን:</div>
+                    <div style="width:60%; display:flex; gap:3px;">
+                        <select id="qDay" class="input-field" style="width:25%;"><option value="ቀን">ቀን</option></select>
+                        <select id="qMonth" class="input-field" style="width:45%;"><option value="ወር">ወር</option></select>
+                        <select id="qYear" class="input-field" style="width:30%;"><option value="ዓመት">ዓመት</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" style="border-left-color: #00897b;">
+                <div class="form-title" style="color: #00897b;">ክፍል ፪፡ የሥራና የመኖሪያ አድራሻ መረጃ</div>
+                <div class="row">
+                    <div class="label">የሥራ ሁኔታ:</div>
+                    <select id="mJobStatus" class="input-field">
+                        <option value="">-- ይምረጡ --</option>
+                        <option value="ተማሪ">ተማሪ</option>
+                        <option value="የመንግሥት ሠራተኛ">የመንግሥት ሠራተኛ</option>
+                        <option value="የግል ሠራተኛ">የግል ሠራተኛ</option>
+                        <option value="የንግድ ሥራ">የንግድ ሥራ</option>
+                    </select>
+                </div>
+                <div class="row"><div class="label">ስልክ ቁጥር:</div><input type="tel" id="mPhone" class="input-field"></div>
+                <div class="row"><div class="label">ክፍለ ከተማ:</div>
+                    <select id="mLoc" class="input-field">
+                        <option value="">-- ይምረጡ --</option>
+                        <option value="ቦሌ">ቦሌ</option><option value="የካ">የካ</option><option value="ንፋስ ስልክ ላፍቶ">ንፋስ ስልክ ላፍቶ</option><option value="ኮልፌ ቀራንዮ">ኮልፌ ቀራንዮ</option><option value="ለሚ ኩራ">ለሚ ኩራ</option><option value="ቂርቆስ">ቂርቆስ</option><option value="ጉለሌ">ጉለሌ</option><option value="አራዳ">አራዳ</option><option value="አዲስ ከተማ">አዲስ ከተማ</option><option value="ልደታ">ልደታ</option><option value="አቃቂ ቃሊቲ">አቃቂ ቃሊቲ</option>
+                    </select>
+                </div>
+                <div class="row"><div class="label">ወረዳ:</div><input type="text" id="mWereda" class="input-field"></div>
+                <div class="row"><div class="label">የቤት ቁጥር:</div><input type="text" id="mHouseNum" class="input-field"></div>
+                <div class="row"><div class="label">የሰፈር ልዩ ስም / ዞን:</div><input type="text" id="mSeferName" class="input-field"></div>
+                <div class="row"><div class="label">ቋሚ መኖሪያ (Location):</div><input type="text" id="mMapLoc" class="input-field"></div>
+            </div>
+
+            <div class="form-section" style="border-left-color: #ffa000;">
+                <div class="form-title" style="color: #ffa000;">ክፍል ፫፡ የሃይማኖት አባት እና ትምህርት</div>
+                <div class="row"><div class="label">የንስሐ አባት ስም:</div><input type="text" id="mGodName" class="input-field"></div>
+                <div class="row"><div class="label">የንስሐ አባት ስልክ ቁጥር:</div><input type="tel" id="mGodPhone" class="input-field"></div>
+                <div class="row"><div class="label">የትምህርት ደረጃ:</div><input type="text" id="mEdu" class="input-field"></div>
+            </div>
+
+            <div class="form-section" style="border-left-color: #e91e63;">
+                <div class="form-title" style="color: #e91e63;">ክፍል ፬፡ የድንገተኛ አደጋ ተጠሪ መረጃ</div>
+                <div class="row"><div class="label">የተጠሪ ሙሉ ስም:</div><input type="text" id="mFamName" class="input-field"></div>
+                <div class="row"><div class="label">የተጠሪ ክርስትና ስም:</div><input type="text" id="mFamChrist" class="input-field"></div>
+                <div class="row"><div class="label">የተጠሪ ስልክ ቁጥር:</div><input type="tel" id="mFamPhone" class="input-field"></div>
+                <div class="row"><div class="label">ከአባሉ ጋር ያለው ዝምድና:</div><input type="text" id="mRelation" class="input-field"></div>
+            </div>
+
+            <div class="form-section" style="border-left-color: #3f51b5;">
+                <div class="form-title" style="color: #3f51b5;">ክፍል ፭፡ የቤተሰብ ሁኔታ መረጃ</div>
+                <div class="row"><div class="label">የአባት ሙሉ ስም:</div><input type="text" id="mFatherName" class="input-field"></div>
+                <div class="row"><div class="label">የአባት ክርስትና ስም:</div><input type="text" id="mFatherChrist" class="input-field"></div>
+                <div class="row"><div class="label">የአባት ስልክ ቁጥር:</div><input type="tel" id="mFatherPhone" class="input-field"></div>
+                <div style="border-top:1px dashed #ccc; margin:8px 0;"></div>
+                <div class="row"><div class="label">የእናት ሙሉ ስም:</div><input type="text" id="mMotherName" class="input-field"></div>
+                <div class="row"><div class="label">የእናት ክርስትና ስም:</div><input type="text" id="mMotherChrist" class="input-field"></div>
+                <div class="row"><div class="label">የእናት ስልክ ቁጥር:</div><input type="tel" id="mMotherPhone" class="input-field"></div>
+            </div>
+            <div class="form-section" style="border-left-color: #795548;">
+                <div class="form-title" style="color: #795548;">ክፍል ፮፡ ምርመራ (ተጨማሪ ማስታወሻ)</div>
+                <textarea id="mNotes" rows="4" placeholder="ስለ አባሉ ማንኛውንም አይነት ተጨማሪ መረጃ ወይም የባህሪ ክትትል እዚህ መጻፍ ይችላሉ..." style="width:100%; border:1px solid #bbb; border-radius:4px; padding:8px; font-size:13px; box-sizing:border-box; font-family:sans-serif;"></textarea>
+            </div>
+
+            <button onclick="addMember()" id="submitBtn" class="btn-block">💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ</button>
+        </div>
+
+    </div>
+
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; border-bottom:2px solid #d4af37; padding-bottom:5px; color:#1a2a3a;">📜 የአባል ሙሉ ማኅደር ፋይል</h3>
+            <div id="profileContent" style="font-size:13px; line-height:1.6; white-space:pre-wrap;"></div>
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button id="modalEditBtn" style="flex:1; background:#ffa000; color:white; border:none; padding:10px; font-weight:bold; border-radius:4px; cursor:pointer;">✏️ ፋይል አሻሽል</button>
+                <button onclick="closeProfile()" style="flex:1; background:#e0e0e0; color:black; border:none; padding:10px; font-weight:bold; border-radius:4px; cursor:pointer;">ዝጋ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⚡ የጃቫስክሪፕት ኮድ በቀጥታ እዚህ ገብቷል ⚡ -->
+    <script>
+        function checkLogin() {
+            var user = document.getElementById("adminUsername").value.trim();
+            var pass = document.getElementById("adminPassword").value.trim();
+            
+            if (user === "admin" && pass === "1234") {
+                document.getElementById("lockScreen").style.display = "none";
+                document.getElementById("mainDashboard").style.display = "block";
+                fetchMembersFromFirebase(); 
+            } else {
+                alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById("lockScreen").style.display = "block";
+            document.getElementById("mainDashboard").style.display = "none";
+            document.getElementById("adminUsername").value = "";
+            document.getElementById("adminPassword").value = "";
+        }
+
+        const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
+        let members = [];
+
+        function fetchMembersFromFirebase() {
+            fetch(`${FIREBASE_URL}/members.json`)
+            .then(response => response.json())
+            .then(data => {
+                members = [];
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        let member = data[key];
+                        member.firebaseKey = key; 
+                        members.push(member);
+                    });
+                }
+                renderMembers();
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                renderMembers(); 
+            });
+        }
+
+        function addMember() {
+            let name = document.getElementById("mName").value.trim();
+            let phone = document.getElementById("mPhone").value.trim();
+            if(!name || !phone) { alert("እባክዎ ቢያንስ ሙሉ ስምና ስልክ ቁጥር ያስገቡ!"); return; }
+
+            let editIdx = parseInt(document.getElementById("editIndex").value);
+            let memberData = {
+                name: name,
+                phone: phone,
+                christName: document.getElementById("mChrist").value.trim(),
+                age: document.getElementById("mAge").value,
+                gender: document.getElementById("mGender").value,
+                blood: document.getElementById("mBlood").value,
+                qurbanStatus: document.getElementById("mQurbanStatus").value,
+                birthDate: `${document.getElementById("birthDay").value}/${document.getElementById("birthMonth").value}/${document.getElementById("birthYear").value}`,
+                lastQurbanDate: `${document.getElementById("qDay").value}/${document.getElementById("qMonth").value}/${document.getElementById("qYear").value}`,
+                address: `${document.getElementById("mLoc").value} ክፍለ ከተማ፣ ወረዳ ${document.getElementById("mWereda").value}`,
+                godfather: document.getElementById("mGodName").value,
+                notes: document.getElementById("mNotes").value || "የለም",
+                registrationDate: new Date().toISOString()
+            };
+
+            if (editIdx === -1) {
+                fetch(`${FIREBASE_URL}/members.json`, { method: "POST", body: JSON.stringify(memberData) })
+                .then(() => { alert("አባል ተመዝግቧል!"); fetchMembersFromFirebase(); });
+            } else {
+                let firebaseKey = members[editIdx].firebaseKey;
+                fetch(`${FIREBASE_URL}/members/${firebaseKey}.json`, { method: "PUT", body: JSON.stringify(memberData) })
+                .then(() => { alert("ማኅደሩ ተሻሽሏል!"); fetchMembersFromFirebase(); });
+            }
+            resetForm();
+            goBack();
+        }
+
+        function renderMembers() {
+            let tbody = document.getElementById("memberTableBody");
+            tbody.innerHTML = "";
+            if(members.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የተመዘገበ አባል የለም።</td></tr>`;
+                return;
+            }
+            members.forEach((m, index) => {
+                let rowStyle = m.qurbanStatus !== "በቅዱስ ቁርባን ያለ" ? "background-color: #ffebee; color: #c62828;" : "";
+                tbody.innerHTML += `<tr style="${rowStyle}">
+                    <td>${index + 1}</td>
+                    <td><b>${m.name}</b></td>
+                    <td>${m.phone}</td>
+                    <td>${m.qurbanStatus}</td>
+                    <td><button onclick="viewProfile(${index})" style="background:#1a2a3a; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">📂 ክፈት</button></td>
+                </tr>`;
+            });
+        }
+
+        function searchMember() {
+            let query = document.getElementById("search").value.toLowerCase();
+            let rows = document.getElementById("memberTableBody").getElementsByTagName("tr");
+            for (let row of rows) {
+                let name = row.getElementsByTagName("td")[1]?.textContent.toLowerCase() || "";
+                let phone = row.getElementsByTagName("td")[2]?.textContent.toLowerCase() || "";
+                row.style.display = (name.includes(query) || phone.includes(query)) ? "" : "none";
+            }
+        }
+
+        function viewProfile(index) {
+            let m = members[index];
+            document.getElementById("profileContent").textContent = `ሙሉ ስም: ${m.name}\nስልክ: ${m.phone}\nየቁርባን ሁኔታ: ${m.qurbanStatus}\nማስታወሻ: ${m.notes}`;
+            document.getElementById("profileModal").style.display = "flex";
+        }
+        function closeProfile() { document.getElementById("profileModal").style.display = "none"; }
+
+        function calculateAge() {
+            let year = document.getElementById("birthYear").value;
+            if(year) { document.getElementById("mAge").value = 2018 - parseInt(year); }
+        }
+
+        function openFolder(id) {
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.querySelectorAll('.file-view').forEach(v => v.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+        }
+        function goBack() {
+            document.querySelectorAll('.file-view').forEach(v => v.style.display = 'none');
+            document.getElementById('mainDashboard').style.display = 'block';
+        }
+        function resetForm() { document.getElementById("editIndex").value = "-1"; }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let bdSel = document.getElementById('birthDay');
+            let bmSel = document.getElementById('birthMonth');
+            let bySel = document.getElementById('birthYear');
+            let qd = document.getElementById('qDay');
+            let qm = document.getElementById('qMonth');
+            let qy = document.getElementById('qYear');
+            let months = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜን"];
+
+            for(let i=1; i<=30; i++) { bdSel.innerHTML += `<option value="${i}">${i}</option>`; qd.innerHTML += `<option value="${i}">${i}</option>`; }
+            months.forEach(m => { bmSel.innerHTML += `<option value="${m}">${m}</option>`; qm.innerHTML += `<option value="${m}">${m}</option>`; });
+            for(let y=1950; y<=2018; y++) { bySel.innerHTML += `<option value="${y}">${y}</option>`; }
+            for(let y=2010; y<=2026; y++) { qy.innerHTML += `<option value="${y}">${y}</option>`; }
+            bySel.value = "1995";
+            calculateAge();
+        });
+    </script>
+</body>
+</html>
