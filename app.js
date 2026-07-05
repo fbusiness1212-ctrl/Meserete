@@ -3,7 +3,7 @@ function checkLogin() {
     var user = document.getElementById("adminUsername").value;
     var pass = document.getElementById("adminPassword").value;
     
-    if (user === "admin" && pass === "1234") {
+    if (user === "Meserete-Hywet" && pass === "2116") {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
         fetchMembersFromFirebase(); // ገጹ ሲከፈት መረጃዎችን ከዳታቤዝ ያመጣል
