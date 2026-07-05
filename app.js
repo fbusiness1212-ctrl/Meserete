@@ -479,3 +479,26 @@ function resetForm() {
     document.getElementById("formActionTitle").textContent = "📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
 }
+window.addEventListener('DOMContentLoaded', () => {
+    let bdSel = document.getElementById('birthDay');
+    let bmSel = document.getElementById('birthMonth');
+    let bySel = document.getElementById('birthYear');
+    let qd = document.getElementById('qDay');
+    let qm = document.getElementById('qMonth');
+    let qy = document.getElementById('qYear');
+    let months = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜን"];
+
+    for(let i=1; i<=30; i++) { bdSel.innerHTML += `<option value="${i}">${i}</option>`; qd.innerHTML += `<option value="${i}">${i}</option>`; }
+    months.forEach(m => { bmSel.innerHTML += `<option value="${m}">${m}</option>`; qm.innerHTML += `<option value="${m}">${m}</option>`; });
+    
+    // 🔄 አውቶማቲክ የአሁኑን የኢትዮጵያ ዓመት መነሻ በማድረግ ምርጫዎችን መሙላት
+    let currentEthYear = new Date().getFullYear() - 8; 
+    
+    // የትውልድ ዓመት ምርጫ ከ1950 ጀምሮ እስከ አሁኑ የኢትዮጵያ ዓመት (2018) ድረስ ብቻ ያሳያል
+    for(let y=1950; y<=currentEthYear; y++) { bySel.innerHTML += `<option value="${y}">${y}</option>`; }
+    // የቁርባን ዓመት ምርጫ ከ2010 ጀምሮ እስከ አሁኑ የኢትዮጵያ ዓመት (2018) ድረስ ያሳያል
+    for(let y=2010; y<=currentEthYear; y++) { qy.innerHTML += `<option value="${y}">${y}</option>`; }
+    
+    bySel.value = "1995";
+    calculateAge();
+});
