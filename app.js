@@ -1,12 +1,14 @@
-// 🔐 የአድሚን መግቢያ ማረጋገጫ
+// 🔐 የአድሚን መግቢያ ማረጋገጫ (Login)
 function checkLogin() {
-    var user = document.getElementById("adminUsername").value;
-    var pass = document.getElementById("adminPassword").value;
+    var user = document.getElementById("adminUsername").value.trim();
+    var pass = document.getElementById("adminPassword").value.trim();
     
     if (user === "Meserete-Hywet" && pass === "2116") {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
-        fetchMembersFromFirebase(); // ገጹ ሲከፈት መረጃዎችን ከዳታቤዝ ያመጣል
+        
+        // 📥 በተሳካ ሁኔታ Login ካደረገ በኋላ ብቻ ዳታቤዙን እንዲያነብ ማድረግ
+        fetchMembersFromFirebase(); 
     } else {
         alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
@@ -20,13 +22,11 @@ function handleLogout() {
     document.getElementById("adminPassword").value = "";
 }
 
-// 🌐 የ Firebase ዳታቤዝ አድራሻ (የአንተ ትክክለኛ ሊንክ ተገጥሞለታል)
+// 🌐 የ Firebase ዳታቤዝ አድራሻ
 const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
 
-// 📂 የአባላት እና የፅዋ መረጃዎችን ለመያዝ
+// 📂 የአባላት መረጃዎችን ለመያዝ
 let members = [];
-let tsiwaList = [];
-let currentViewingIndex = -1;
 
 // 📥 መረጃዎችን ከ Firebase ዳታቤዝ ማውረጃ ፈንክሽን
 function fetchMembersFromFirebase() {
@@ -35,16 +35,19 @@ function fetchMembersFromFirebase() {
     .then(data => {
         members = [];
         if (data) {
-            // ከዳታቤዝ የመጣውን መረጃ ወደ Array መቀየሪያ
             Object.keys(data).forEach(key => {
                 let member = data[key];
-                member.firebaseKey = key; // ለእያንዳንዱ አባል መለያ ቁልፍ መስጠት
+                member.firebaseKey = key; 
                 members.push(member);
             });
         }
         renderMembers();
     })
-    .catch(error => console.error("መረጃ ከዳታቤዝ ሲመጣ ስህተት ተፈጥሯል:", error));
+    .catch(error => {
+        console.error("ዳታቤዝ ማንበብ አልተቻለም፦", error);
+        // ዳታቤዙ ባዶ ቢሆን እንኳ ገጹ እንዳይቆም ዝርዝሩን ባዶ አድርጎ ያሳያል
+        renderMembers(); 
+    });
 }
 
 // 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ (ወደ Firebase ይልካል)
@@ -90,7 +93,6 @@ function addMember() {
     };
 
     if (editIdx === -1) {
-        // 1️⃣ አዲስ ምዝገባ ከሆነ -> ቀጥታ ወደ Firebase መላክ (POST)
         memberData.registrationDate = todayDate.toISOString();
         
         fetch(`${FIREBASE_URL}/members.json`, {
@@ -99,10 +101,9 @@ function addMember() {
         })
         .then(() => {
             alert("አባል በተሳካ ሁኔታ በዳታቤዝ ውስጥ ተመዝግቧል!");
-            fetchMembersFromFirebase(); // ገጹን በዳታቤዝ ማደሻ
+            fetchMembersFromFirebase(); 
         });
     } else {
-        // 2️⃣ ነባር መረጃ ማሻሻያ ከሆነ -> በ Firebase ላይ ማደስ (PUT)
         let firebaseKey = members[editIdx].firebaseKey;
         memberData.registrationDate = members[editIdx].registrationDate || todayDate.toISOString();
         
@@ -121,7 +122,7 @@ function addMember() {
     goBack();
 }
 
-// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ (ከቀለም እና የ3 ወር ማስጠንቀቂያ ጋር)
+// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ
 function renderMembers() {
     let tbody = document.getElementById("memberTableBody");
     tbody.innerHTML = "";
@@ -161,7 +162,7 @@ function renderMembers() {
     });
 }
 
-// 🔍 አባላትን በስም ወይም በስልክ መፈለጊያ
+// 🔍 አባላትን መፈለጊያ
 function searchMember() {
     let query = document.getElementById("search").value.toLowerCase();
     let rows = document.getElementById("memberTableBody").getElementsByTagName("tr");
@@ -182,13 +183,12 @@ function searchMember() {
 
 // 📜 የአባል ማኅደር ፋይልን መክፈቻ
 function viewProfile(index) {
-    currentViewingIndex = index;
     let m = members[index];
     let content = `** የግል መረጃ **\nሙሉ ስም: ${m.name}\nየክርስትና ስም: ${m.christName}\nጾታ: ${m.gender} | ዕድሜ: ${m.age} | የደም ዓይነት: ${m.blood}\nትውልድ ዘመን: ${m.birthDate}\n\n** አድራሻ እና ሥራ **\nስልክ: ${m.phone}\nመኖሪያ: ${m.address}\n\n** መንፈሳዊ መረጃ **\nየንሥሐ አባት: ${m.godfather}\nየቁርባን ሁኔታ: ${m.qurbanStatus} (የመጨረሻ: ${m.lastQurbanDate})\n\n** ተጨማሪ ማስታወሻ **\n${m.notes}`;
     
     document.getElementById("profileContent").textContent = content;
-    document.getElementById("modalQurbanCheck").checked = m.qurbanTrack.checked;
-    document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${m.qurbanTrack.lastUpdated}`;
+    document.getElementById("modalQurbanCheck").checked = m.qurbanTrack ? m.qurbanTrack.checked : false;
+    document.getElementById("modalLastUpdatedText").textContent = m.qurbanTrack ? `መጨረሻ የተሻሻለው፦ ${m.qurbanTrack.lastUpdated}` : "";
     
     document.getElementById("modalEditBtn").onclick = function() {
         closeProfile();
@@ -223,10 +223,9 @@ function editMember(index) {
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
-        let currentEthiopianYear = 2018; // አሁን ያለንበት የኢትዮጵያ ዓመተ ምህረት
+        let currentEthiopianYear = 2018; 
         let age = currentEthiopianYear - parseInt(yearInput);
         
-        // ዕድሜው ከዜሮ በታች እንዳይሆን መቆጣጠሪያ
         if(age >= 0) {
             document.getElementById("mAge").value = age;
         } else {
@@ -234,6 +233,7 @@ function calculateAge() {
         }
     }
 }
+
 function resetForm() {
     document.getElementById("editIndex").value = "-1";
     document.getElementById("mName").value = "";
