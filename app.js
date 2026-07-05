@@ -1,404 +1,260 @@
-let members = JSON.parse(localStorage.getItem('mahber_members')) || [];
-let tsiwas = JSON.parse(localStorage.getItem('mahber_tsiwas')) || [];
-
-// 🔐 የአድሚን መግቢያ መረጃዎች
-const ADMIN_USER = "Mahber";
-const ADMIN_PASS = "2116";
-let activeModalIndex = -1;
-let editTsiwaIndex = -1;
-
-// 🔄 ገጹ ሲከፈት ከዚህ በፊት Login ማድረጉን ቼክ ማድረጊያ (በራስ-ሰር እንዳይቆለፍ)
-window.addEventListener('load', () => {
-    if (localStorage.getItem('mahber_isLoggedIn') === 'true') {
-        document.getElementById('lockScreen').style.display = 'none';
-        document.getElementById('mainDashboard').style.display = 'block';
-        showMembers();
-        showTsiwas();
-    }
-});
-
-// 💻 አዲሱ የLogin ማረጋገጫ ፈንክሽን
+// 🔐 የአድሚን መግቢያ ማረጋገጫ
 function checkLogin() {
-    let userInput = document.getElementById('adminUsername').value.trim();
-    let passInput = document.getElementById('adminPassword').value.trim();
+    var user = document.getElementById("adminUsername").value;
+    var pass = document.getElementById("adminPassword").value;
     
-    if (userInput === ADMIN_USER && passInput === ADMIN_PASS) {
-        localStorage.setItem('mahber_isLoggedIn', 'true'); // መግባቱን አስታውስ
-        document.getElementById('lockScreen').style.display = 'none';
-        document.getElementById('mainDashboard').style.display = 'block';
-        showMembers();
-        showTsiwas();
-        
-        // የገቡበትን ፎርም አጽዳ
-        document.getElementById('adminUsername').value = "";
-        document.getElementById('adminPassword').value = "";
+    if (user === "Meserete-Hywet" && pass === "2116") {
+        document.getElementById("lockScreen").style.display = "none";
+        document.getElementById("mainDashboard").style.display = "block";
     } else {
-        alert("❌ የተጠቃሚ ስም ወይም የይለፍ ቃል የተሳሳተ ነው!");
+        alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
 }
 
-// 🚪 ሲስተሙን መቆለፊያ (Logout)
+// 🔒 ከመለያ መውጫ
 function handleLogout() {
-    localStorage.removeItem('mahber_isLoggedIn');
-    document.getElementById('mainDashboard').style.display = 'none';
-    document.querySelectorAll('.file-view').forEach(view => view.style.display = 'none');
-    document.getElementById('lockScreen').style.display = 'block';
+    document.getElementById("lockScreen").style.display = "block";
+    document.getElementById("mainDashboard").style.display = "none";
+    document.getElementById("adminUsername").value = "";
+    document.getElementById("adminPassword").value = "";
 }
 
-// 📅 በየዓመቱ ዕድሜን በራስ-ሰር ማስያዣ ፈንክሽን
-function calculateAge() {
-    let birthYear = parseInt(document.getElementById('birthYear').value) || 1995;
-    const CURRENT_ETHIOPIAN_YEAR = 2018; 
-    let age = CURRENT_ETHIOPIAN_YEAR - birthYear;
-    if(age < 0) age = 0;
-    document.getElementById('mAge').innerText = age;
-    document.getElementById('mAge').value = age;
-    return age;
-}
+// 📂 የአባላት እና የፅዋ መረጃዎችን ለመያዝ
+let members = [];
+let tsiwaList = [];
+let currentViewingIndex = -1;
 
-function saveToLocalStorage() {
-    localStorage.setItem('mahber_members', JSON.stringify(members));
-    localStorage.setItem('mahber_tsiwas', JSON.stringify(tsiwas));
-}
-
-// 💾 አባል መመዝገቢያ እና ማሻሻያ (Add / Edit) ፈንክሽን
+// 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ
 function addMember() {
-    let name = document.getElementById('mName').value.trim();
-    let christ = document.getElementById('mChrist').value.trim();
-    let bDay = document.getElementById('birthDay').value;
-    let bMonth = document.getElementById('birthMonth').value;
-    let bYear = document.getElementById('birthYear').value;
-    let age = calculateAge();
-    let gender = document.getElementById('mGender').value;
-    let nationality = document.getElementById('mNationality').value.trim();
-    let blood = document.getElementById('mBlood').value;
-    
-    let qurbanStatus = document.getElementById('mQurbanStatus').value;
-    let qDay = document.getElementById('qDay').value;
-    let qMonth = document.getElementById('qMonth').value;
-    let qYear = document.getElementById('qYear').value;
-    let qDateFull = (qDay !== "ቀን" && qMonth !== "ወር" && qYear !== "ዓመት") ? `${qMonth} ${qDay} ቀን ${qYear} ዓ.ም` : "ቀን አልተጠቀሰም";
+    let name = document.getElementById("mName").value.trim();
+    let phone = document.getElementById("mPhone").value.trim();
+    let christName = document.getElementById("mChrist").value.trim();
+    let bDay = document.getElementById("birthDay").value;
+    let bMonth = document.getElementById("birthMonth").value;
+    let bYear = document.getElementById("birthYear").value;
+    let age = document.getElementById("mAge").value;
+    let gender = document.getElementById("mGender").value;
+    let blood = document.getElementById("mBlood").value;
+    let qurbanStatus = document.getElementById("mQurbanStatus").value;
+    let qDay = document.getElementById("qDay").value;
+    let qMonth = document.getElementById("qMonth").value;
+    let qYear = document.getElementById("qYear").value;
+    let job = document.getElementById("mJobStatus").value;
+    let loc = document.getElementById("mLoc").value;
+    let wereda = document.getElementById("mWereda").value;
+    let houseNum = document.getElementById("mHouseNum").value;
+    let sefer = document.getElementById("mSeferName").value;
+    let godName = document.getElementById("mGodName").value;
+    let godPhone = document.getElementById("mGodPhone").value;
+    let notes = document.getElementById("mNotes").value;
 
-    let jobStatus = document.getElementById('mJobStatus').value;
-    let phone = document.getElementById('mPhone').value.trim();
-    let kifleKetema = document.getElementById('mLoc').value;
-    let wereda = document.getElementById('mWereda').value.trim();
-    let houseNum = document.getElementById('mHouseNum').value.trim();
-    let seferName = document.getElementById('mSeferName').value.trim();
-    let mapLoc = document.getElementById('mMapLoc').value.trim();
-    
-    let gName = document.getElementById('mGodName').value.trim();
-    let gPhone = document.getElementById('mGodPhone').value.trim();
-    let edu = document.getElementById('mEdu').value.trim();
-    
-    let famName = document.getElementById('mFamName').value.trim();
-    let famChrist = document.getElementById('mFamChrist').value.trim();
-    let famPhone = document.getElementById('mFamPhone').value.trim();
-    let relation = document.getElementById('mRelation').value.trim();
-
-    let fatherName = document.getElementById('mFatherName').value.trim();
-    let fatherChrist = document.getElementById('mFatherChrist').value.trim();
-    let fatherPhone = document.getElementById('mFatherPhone').value.trim();
-    let motherName = document.getElementById('mMotherName').value.trim();
-    let motherChrist = document.getElementById('mMotherChrist').value.trim();
-    let motherPhone = document.getElementById('mMotherPhone').value.trim();
-    
-    let notes = document.getElementById('mNotes').value.trim();
-
-    if (!name || !christ || !phone || !gender || !jobStatus) { 
-        return alert('እባክዎ ስም፣ የክርስትና ስም፣ ጾታ፣ ስልክ እና የሥራ ሁኔታ ያሟሉ!'); 
-    }
-
-    let editIndex = parseInt(document.getElementById('editIndex').value);
-
-    let lastCheckedTime = editIndex !== -1 ? (members[editIndex].lastCheckedTime || Date.now()) : Date.now();
-    let qurbanCheckedThisMonth = editIndex !== -1 ? (members[editIndex].qurbanCheckedThisMonth || false) : false;
-
-    let memberData = {
-        name, christ, bDay, bMonth, bYear, age, gender, nationality, blood,
-        qurbanStatus, qDateFull, qDay, qMonth, qYear,
-        jobStatus, phone, kifleKetema, wereda, houseNum, seferName, mapLoc,
-        gName, gPhone, edu,
-        famName, famChrist, famPhone, relation,
-        fatherName, fatherChrist, fatherPhone, motherName, motherChrist, motherPhone,
-        notes, lastCheckedTime, qurbanCheckedThisMonth
-    };
-
-    if (editIndex === -1) {
-        members.push(memberData);
-        alert('🎯 አዲሱ አባል በስኬት በፎልደር ውስጥ ተመዝግቧል!');
-    } else {
-        members[editIndex] = memberData;
-        alert('✏️ የአባሉ ማህደር መረጃ በስኬት ታድሷል (የተስተካከለ)!');
-    }
-
-    saveToLocalStorage();
-    showMembers();
-    resetForm();
-    goBack();
-}
-
-// 🔴 የ3 ወር የቁርባን ማስጠንቀቂያ ቼክ ማድረጊያ ፎርሙላ
-function isQurbanOverdue(member) {
-    if (member.qurbanCheckedThisMonth) return false;
-    let threeMonthsInMs = 3 * 30 * 24 * 60 * 60 * 1000; 
-    let timePassed = Date.now() - member.lastCheckedTime;
-    return timePassed > threeMonthsInMs;
-}
-
-function showMembers() {
-    let tbody = document.getElementById('memberTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    let searchTerm = document.getElementById('search').value.toLowerCase();
-    
-    let filtered = members.filter(m => m.name.toLowerCase().includes(searchTerm) || m.phone.includes(searchTerm));
-
-    if(filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:gray;">ምንም መዝገብ ፋይል አልተገኘም</td></tr>';
+    if(!name || !phone) {
+        alert("እባክዎ ቢያንስ ሙሉ ስምና ስልክ ቁጥር ያስገቡ!");
         return;
     }
 
-    filtered.forEach((m, idx) => {
-        let originalIndex = members.indexOf(m);
-        let rowClass = isQurbanOverdue(m) ? 'class="danger-row"' : '';
-        
-        let currentYear = 2018;
-        let realAge = currentYear - (parseInt(m.bYear) || 1995);
-        if(realAge < 0) realAge = 0;
+    // 🕒 አባል የተመዘገበበትን ትክክለኛ የኢትዮጵያ/የዛሬ ቀን መያዣ (ለ3 ወር ማስጠንቀቂያ ክትትል)
+    let todayDate = new Date();
 
-        tbody.innerHTML += `
-            <tr ${rowClass}>
-                <td>${idx + 1}</td>
-                <td style="font-weight:bold;">📂 ${m.name}</td>
-                <td>${m.phone}</td>
-                <td>${realAge} ዓመት</td>
-                <td>
-                    <button onclick="openProfile(${originalIndex})" style="background:#1a2a3a; color:white; border:none; padding:5px 10px; font-size:11px; font-weight:bold; border-radius:3px; cursor:pointer;">ማህደር ክፈት</button>
-                </td>
-            </tr>
-        `;
+    let memberData = {
+        name, phone, christName, age, gender, blood, qurbanStatus,
+        birthDate: `${bDay}/${bMonth}/${bYear}`,
+        lastQurbanDate: `${qDay}/${qMonth}/${qYear}`,
+        address: `${loc} ክፍለ ከተማ፣ ወረዳ ${wereda}፣ የቤት ቁጥር ${houseNum} (${sefer})`,
+        godfather: `${godName} (ስልክ: ${godPhone})`,
+        notes: notes || "የለም",
+        registrationDate: todayDate.toISOString(), // የገባበት ቀን በቋሚነት ይመዘገባል
+        qurbanTrack: { checked: qurbanStatus === "በቅዱስ ቁርባን ያለ", lastUpdated: "በምዝገባ ወቅት" }
+    };
+
+    let editIdx = parseInt(document.getElementById("editIndex").value);
+    if (editIdx === -1) {
+        members.push(memberData);
+        alert("አባል በተሳካ ሁኔታ በፎልደር ውስጥ ተመዝግቧል!");
+    } else {
+        // መረጃው ሲሻሻል የድሮውን መመዝገቢያ ቀን እንዳያጠፋው ማረጋገጫ
+        memberData.registrationDate = members[editIdx].registrationDate || todayDate.toISOString();
+        members[editIdx] = memberData;
+        alert("የአባል ማኅደር ፋይል በተሳካ ሁኔታ ተሻሽሏል!");
+        document.getElementById("editIndex").value = "-1";
+    }
+
+    resetForm();
+    goBack();
+    renderMembers();
+}
+
+// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ (ከቀለም እና የ3 ወር ማስጠንቀቂያ ጋር)
+function renderMembers() {
+    let tbody = document.getElementById("memberTableBody");
+    tbody.innerHTML = "";
+    
+    if(members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የተመዘገበ አባል የለም።</td></tr>`;
+        return;
+    }
+
+    let today = new Date();
+
+    members.forEach((m, index) => {
+        let rowClass = "";
+        let rowStyle = "";
+        let warningBadge = "";
+
+        // 1️⃣ ቅዱስ ቁርባን የተቀበለ ካልሆነ (በቅዱስ ቁርባን የሌለ ከሆነ) ሙሉ መስመሩን ቀይ ማድረጊያ
+        if (m.qurbanStatus !== "በቅዱስ ቁርባን ያለ") {
+            rowStyle = "background-color: #ffebee; color: #c62828; font-weight: 500; border-bottom: 1px solid #ffcdd2;";
+        }
+
+        // 2️⃣ ከተመዘገበ 3 ወር (90 ቀን) ያለፈው መሆኑን ማረጋገጫ እና ማስጠንቀቂያ ማውጫ
+        if (m.registrationDate) {
+            let regDate = new Date(m.registrationDate);
+            let timeDiff = today.getTime() - regDate.getTime();
+            let daysDiff = timeDiff / (1000 * 3600 * 24); // ወደ ቀናት መቀየሪያ
+
+            if (daysDiff >= 90) {
+                warningBadge = ` <span style="background-color: #d32f2f; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 6px; display: inline-block; border: 1px solid white;">⚠️ የ3 ወር ማስጠንቀቂያ!</span>`;
+            }
+        }
+
+        tbody.innerHTML += `<tr style="${rowStyle}" class="${rowClass}">
+            <td>${index + 1}</td>
+            <td><b>${m.name}</b> ${warningBadge}</td>
+            <td>${m.phone}</td>
+            <td>${m.qurbanStatus}</td>
+            <td><button onclick="viewProfile(${index})" style="background:#1a2a3a; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">📂 ክፈት</button></td>
+        </tr>`;
     });
 }
 
-// 📜 የማህደር ፋይል መመልከቻ
-function openProfile(index) {
-    activeModalIndex = index;
+// 🔍 አባላትን በስም ወይም በስልክ መፈለጊያ
+function searchMember() {
+    let query = document.getElementById("search").value.toLowerCase();
+    let rows = document.getElementById("memberTableBody").getElementsByTagName("tr");
+    for (let row of rows) {
+        let nameCell = row.getElementsByTagName("td")[1];
+        let phoneCell = row.getElementsByTagName("td")[2];
+        if (nameCell && phoneCell) {
+            let nameText = nameCell.textContent.toLowerCase();
+            let phoneText = phoneCell.textContent.toLowerCase();
+            if (nameText.includes(query) || phoneText.includes(query)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+    }
+}
+
+// 📜 የአባል ማኅደር ፋይልን በፖፕ-አፕ (Modal) መክፈቻ
+function viewProfile(index) {
+    currentViewingIndex = index;
     let m = members[index];
+    let content = `** የግል መረጃ **\nሙሉ ስም: ${m.name}\nየክርስትና ስም: ${m.christName}\nጾታ: ${m.gender} | ዕድሜ: ${m.age} | የደም ዓይነት: ${m.blood}\nትውልድ ዘመን: ${m.birthDate}\n\n** አድራሻ እና ሥራ **\nስልክ: ${m.phone}\nመኖሪያ: ${m.address}\n\n** መንፈሳዊ መረጃ **\nየንሥሐ አባት: ${m.godfather}\nየቁርባን ሁኔታ: ${m.qurbanStatus} (የመጨረሻ: ${m.lastQurbanDate})\n\n** ተጨማሪ ማስታወሻ **\n${m.notes}`;
     
-    let currentYear = 2018;
-    let calculatedAge = currentYear - (parseInt(m.bYear) || 1995);
-
-    let content = `👤 [ክፍል ፩: የግል ማኅደራዊ መረጃ]\n` +
-          `• ሙሉ ስም: ${m.name}\n` +
-          `• የክርስትና ስም: ${m.christ}\n` +
-          `• የትውልድ ዘመን: ${m.bMonth} ${m.bDay} ቀን ${m.bYear} ዓ.ም\n` +
-          `• የአሁኑ ዕድሜ: ${calculatedAge} ዓመት\n` +
-          `• ጾታ: ${m.gender} | ዜግነት: ${m.nationality}\n` +
-          `• የደም ዓይነት: ${m.blood}\n` +
-          `• የቁርባን መነሻ ሁኔታ: ${m.qurbanStatus} (${m.qDateFull})\n\n` +
-          `💼 [ክፍል ፪: የሥራና አድራሻ መረጃ]\n` +
-          `• የሥራ ሁኔታ: ${m.jobStatus}\n` +
-          `• ስልክ ቁጥር: ${m.phone}\n` +
-          `• ክፍለ ከተማ: ${m.kifleKetema || 'ያልተገለጸ'} | ወረዳ: ${m.wereda || '-'} | የቤት ቁጥር: ${m.houseNum || '-'}\n` +
-          `• ሰፈር / ዞን: ${m.seferName || 'ያልተገለጸ'}\n` +
-          `• ቋሚ መኖሪያ (Location): ${m.mapLoc || 'ያልተገለጸ'}\n\n` +
-          `⛪ [ክፍል ፫: የሃይማኖት አባት እና ትምህርት]\n` +
-          `• የክርስትና አባት ስም: ${m.gName || 'ያልተገለጸ'}\n` +
-          `• የአባት ስልክ ቁጥር: ${m.gPhone || 'ያልተገለጸ'}\n` +
-          `• የትምህርት ደረጃ: ${m.edu || 'ያልተገለጸ'}\n\n` +
-          `🚑 [ክፍል ፬: የድንገተኛ አደጋ ተጠሪ]\n` +
-          `• ተጠሪ ስም: ${m.famName} (${m.relation})\n` +
-          `• ተጠሪ ስልክ: ${m.famPhone} | ክርስትና ስም: ${m.famChrist || '-'}\n\n` +
-          `👨‍👩‍👦 [ክፍል ፭: የቤተሰብ ሁኔታ መረጃ]\n` +
-          `• የአባት ስም: ${m.fatherName || '-'} | ክርስትና፡ ${m.fatherChrist || '-'} | ስልክ፡ ${m.fatherPhone || '-'}\n` +
-          `• የእናት ስም: ${m.motherName || '-'} | ክርስትና፡ ${m.motherChrist || '-'} | ስልክ፡ ${m.motherPhone || '-'}\n\n` +
-          `📝 [ክፍል ፮: ምርመራ]\n${m.notes || 'ምንም ማስታወሻ የለም'}`;
-
-    document.getElementById('profileContent').innerText = content;
-    document.getElementById('modalQurbanCheck').checked = m.qurbanCheckedThisMonth || false;
+    document.getElementById("profileContent").textContent = content;
+    document.getElementById("modalQurbanCheck").checked = m.qurbanTrack.checked;
+    document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${m.qurbanTrack.lastUpdated}`;
     
-    let lastDate = new Date(m.lastCheckedTime).toLocaleDateString('am-ET');
-    document.getElementById('modalLastUpdatedText').innerText = `የመጨረሻ ማረጋገጫ የተደረገበት ቀን፡ ${lastDate}`;
-
-    document.getElementById('modalEditBtn').onclick = function() {
+    document.getElementById("modalEditBtn").onclick = function() {
         closeProfile();
-        editMemberForm(index);
+        editMember(index);
     };
-
-    document.getElementById('profileModal').style.display = 'flex';
+    document.getElementById("profileModal").style.display = "flex";
 }
 
 function closeProfile() {
-    document.getElementById('profileModal').style.display = 'none';
-    activeModalIndex = -1;
+    document.getElementById("profileModal").style.display = "none";
 }
 
+// 🗓️ የወርሃዊ ቁርባን ክትትል ማስተካከያ
 function toggleMonthlyQurban() {
-    if (activeModalIndex === -1) return;
-    let isChecked = document.getElementById('modalQurbanCheck').checked;
-    members[activeModalIndex].qurbanCheckedThisMonth = isChecked;
-    members[activeModalIndex].lastCheckedTime = Date.now();
-    saveToLocalStorage();
-    showMembers();
-    let lastDate = new Date(Date.now()).toLocaleDateString('am-ET');
-    document.getElementById('modalLastUpdatedText').innerText = `የመጨረሻ ማረጋገጫ የተደረገበት ቀን፡ ${lastDate}`;
+    if(currentViewingIndex !== -1) {
+        let checked = document.getElementById("modalQurbanCheck").checked;
+        members[currentViewingIndex].qurbanTrack.checked = checked;
+        members[currentViewingIndex].qurbanTrack.lastUpdated = checked ? "የዚህ ወር ተፈጽሟል" : "ተደናቅፏል / አልቆረበም";
+        document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${members[currentViewingIndex].qurbanTrack.lastUpdated}`;
+        renderMembers();
+    }
 }
 
-function editMemberForm(index) {
+// ✏️ የአባል ፋይል ማሻሻያ (Edit) ወደ ፎርም መጫኛ
+function editMember(index) {
     let m = members[index];
-    document.getElementById('editIndex').value = index;
-    document.getElementById('formActionTitle').innerText = `✏️ የማህደር ፋይል ማስተካከያ (አደራጅ)፦ ${m.name}`;
-    document.getElementById('submitBtn').innerText = `💾 የተስተካከለውን ፋይል አሻሽለህ መዝግብ`;
-
-    document.getElementById('mName').value = m.name;
-    document.getElementById('mChrist').value = m.christ;
-    document.getElementById('birthDay').value = m.bDay;
-    document.getElementById('birthMonth').value = m.bMonth;
-    document.getElementById('birthYear').value = m.bYear;
-    document.getElementById('mGender').value = m.gender;
-    document.getElementById('mNationality').value = m.nationality;
-    document.getElementById('mBlood').value = m.blood;
-    document.getElementById('mQurbanStatus').value = m.qurbanStatus;
+    document.getElementById("editIndex").value = index;
+    document.getElementById("mName").value = m.name;
+    document.getElementById("mPhone").value = m.phone;
+    document.getElementById("mChrist").value = m.christName;
+    document.getElementById("mAge").value = m.age;
+    document.getElementById("mGender").value = m.gender;
+    document.getElementById("mBlood").value = m.blood;
+    document.getElementById("mQurbanStatus").value = m.qurbanStatus;
+    document.getElementById("mNotes").value = m.notes;
     
-    if(m.qDay) document.getElementById('qDay').value = m.qDay;
-    if(m.qMonth) document.getElementById('qMonth').value = m.qMonth;
-    if(m.qYear) document.getElementById('qYear').value = m.qYear;
-
-    document.getElementById('mJobStatus').value = m.jobStatus;
-    document.getElementById('mPhone').value = m.phone;
-    document.getElementById('mLoc').value = m.kifleKetema;
-    document.getElementById('mWereda').value = m.wereda;
-    document.getElementById('mHouseNum').value = m.houseNum;
-    document.getElementById('mSeferName').value = m.seferName;
-    document.getElementById('mMapLoc').value = m.mapLoc;
-    
-    document.getElementById('mGodName').value = m.gName;
-    document.getElementById('mGodPhone').value = m.gPhone;
-    document.getElementById('mEdu').value = m.edu;
-    
-    document.getElementById('mFamName').value = m.famName;
-    document.getElementById('mFamChrist').value = m.famChrist;
-    document.getElementById('mFamPhone').value = m.famPhone;
-    document.getElementById('mRelation').value = m.relation;
-
-    document.getElementById('mFatherName').value = m.fatherName || '';
-    document.getElementById('mFatherChrist').value = m.fatherChrist || '';
-    document.getElementById('mFatherPhone').value = m.fatherPhone || '';
-    document.getElementById('mMotherName').value = m.motherName || '';
-    document.getElementById('mMotherChrist').value = m.motherChrist || '';
-    document.getElementById('mMotherPhone').value = m.motherPhone || '';
-    
-    document.getElementById('mNotes').value = m.notes || '';
-
-    calculateAge();
+    document.getElementById("formActionTitle").textContent = "✏️ የአባል ማኅደር ፋይል ማሻሻያ ቅጽ";
+    document.getElementById("submitBtn").textContent = "💾 የተቀየረውን ፋይል አሻሽለህ መዝግብ";
     openFolder('newRegistrationFolder');
 }
 
-function resetForm() {
-    document.getElementById('editIndex').value = "-1";
-    document.getElementById('formActionTitle').innerText = `📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ`;
-    document.getElementById('submitBtn').innerText = `💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ`;
-    
-    let fields = ['mName', 'mChrist', 'mPhone', 'mHouseNum', 'mSeferName', 'mMapLoc', 'mGodName', 'mGodPhone', 'mEdu', 'mFamName', 'mFamChrist', 'mFamPhone', 'mRelation', 'mFatherName', 'mFatherChrist', 'mFatherPhone', 'mMotherName', 'mMotherChrist', 'mMotherPhone', 'mNotes'];
-    fields.forEach(f => { document.getElementById(f).value = ''; });
-    
-    document.getElementById('mGender').value = '';
-    document.getElementById('mJobStatus').value = '';
-    document.getElementById('mLoc').value = '';
-    document.getElementById('birthYear').value = '1995';
-    document.getElementById('qDay').value = 'ቀን';
-    document.getElementById('qMonth').value = 'ወር';
-    document.getElementById('qYear').value = 'ዓመት';
-    calculateAge();
-}
-
-function searchMember() {
-    showMembers();
-}
-
-// ==================== 🗓️ የፅዋ መዝገብ ክፍሎች ====================
-
+// 🏆 ፅዋ መዝገብ (ሴንተሬዝ) ስራዎች
 function addTsiwa() {
-    let name = document.getElementById('tName').value.trim();
-    let mem = document.getElementById('tMember').value.trim();
-    let d = document.getElementById('ethDay').value;
-    let m = document.getElementById('ethMonth').value;
-    let y = document.getElementById('ethYear').value;
-    let fullEthDate = `${m} ${d} ቀን ${y} ዓ.ም`;
-    
-    if(!name || !mem) return alert('እባክዎ የፅዋውን ስም እና የአባሉን ስም ያስገቡ!');
-    
-    if (editTsiwaIndex === -1) {
-        tsiwas.push({name, mem, date: fullEthDate, d, m, y, isTurnDone: false});
-        alert('🎯 አዲሱ ፅዋ በስኬት ተመዝግቧል!');
-    } else {
-        let currentStatus = tsiwas[editTsiwaIndex].isTurnDone || false;
-        tsiwas[editTsiwaIndex] = {name, mem, date: fullEthDate, d, m, y, isTurnDone: currentStatus};
-        alert('✏️ የፅዋው መረጃ በስኬት ታድሷል!');
-        editTsiwaIndex = -1;
-        document.getElementById('tsiwaFormTitle').innerText = "[+] አዲስ የፅዋ ዕጣ መዝግብ";
-        document.getElementById('tsiwaSubmitBtn').innerText = "ፅዋ መዝግብ";
-    }
-    
-    saveToLocalStorage();
-    showTsiwas();
-    document.getElementById('tName').value = '';
-    document.getElementById('tMember').value = '';
-}
+    let tName = document.getElementById("tName").value.trim();
+    let tMember = document.getElementById("tMember").value.trim();
+    let d = document.getElementById("ethDay").value;
+    let m = document.getElementById("ethMonth").value;
+    let y = document.getElementById("ethYear").value;
 
-function showTsiwas() {
-    let tbody = document.getElementById('tsiwaTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    if(tsiwas.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የተመዘገበ ፅዋ የለም</td></tr>';
+    if(!tName || !tMember) {
+        alert("እባክዎ የፅዋ ስምና የባለዕጣውን አባል ስም ያስገቡ!");
         return;
     }
-    tsiwas.forEach((t, index) => {
-        let checkStyle = t.isTurnDone ? 'checked' : '';
-        let rowBG = t.isTurnDone ? 'style="background-color: #e2f0d9;"' : '';
 
-        tbody.innerHTML += `
-            <tr ${rowBG}>
-                <td>${index + 1}</td>
-                <td style="font-weight:bold; color:#b8860b;">የ${t.name} ፅዋ</td>
-                <td>${t.mem}</td>
-                <td>🗓️ ${t.date}</td>
-                <td style="text-align:center;">
-                    <input type="checkbox" ${checkStyle} onclick="toggleTsiwaStatus(${index})" style="cursor:pointer; transform: scale(1.2); margin-right: 10px;" title="ፅዋ አውጥቷል">
-                    <button onclick="editTsiwaForm(${index})" style="background:#ffa000; color:white; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:3px; cursor:pointer; margin-right: 5px;">አስተካክል</button>
-                    <button onclick="deleteTsiwa(${index})" style="background:#ef5350; color:white; border:none; padding:4px 8px; font-size:11px; font-weight:bold; border-radius:3px; cursor:pointer;">አጥፋ</button>
-                </td>
-            </tr>
-        `;
+    tsiwaList.push({ name: tName, member: tMember, date: `${m} ${d} ቀን ${y} ዓ.ም` });
+    alert("የፅዋ ዕጣ በተሳካ ሁኔታ ተመዝግቧል!");
+    
+    document.getElementById("tName").value = "";
+    document.getElementById("tMember").value = "";
+    renderTsiwa();
+}
+
+function renderTsiwa() {
+    let tbody = document.getElementById("tsiwaTableBody");
+    tbody.innerHTML = "";
+    if(tsiwaList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የፅዋ ዕጣ አልተመዘገበም።</td></tr>`;
+        return;
+    }
+    tsiwaList.forEach((t, index) => {
+        tbody.innerHTML += `<tr>
+            <td>${index + 1}</td>
+            <td><b>${t.name}</b></td>
+            <td>${t.member}</td>
+            <td>${t.date}</td>
+            <td style="text-align:center;"><button onclick="tsiwaList.splice(${index},1); renderTsiwa();" style="background:#c62828; color:white; border:none; padding:3px 7px; border-radius:3px; cursor:pointer; font-size:11px;">🔄 ዕጣ ቀይር</button></td>
+        </tr>`;
     });
 }
 
-function toggleTsiwaStatus(index) {
-    tsiwas[index].isTurnDone = !tsiwas[index].isTurnDone;
-    saveToLocalStorage();
-    showTsiwas();
-}
-
-function editTsiwaForm(index) {
-    editTsiwaIndex = index;
-    let t = tsiwas[index];
-    document.getElementById('tName').value = t.name;
-    document.getElementById('tMember').value = t.mem;
-    if(t.d) document.getElementById('ethDay').value = t.d;
-    if(t.m) document.getElementById('ethMonth').value = t.m;
-    if(t.y) document.getElementById('ethYear').value = t.y;
-    
-    document.getElementById('tsiwaFormTitle').innerText = `✏️ የፅዋ መረጃ ማስተካከያ፦ የ${t.name} ፅዋ`;
-    document.getElementById('tsiwaSubmitBtn').innerText = "💾 የተስተካከለውን ፅዋ አሻሽል";
-    document.getElementById('tsiwaFormTitle').scrollIntoView({ behavior: 'smooth' });
-}
-
-function deleteTsiwa(index) {
-    if(confirm("❌ ይህንን የፅዋ መዝገብ በእርግጠኝነት ማጥፋት ይፈልጋሉ?")) {
-        tsiwas.splice(index, 1);
-        saveToLocalStorage();
-        showTsiwas();
+// 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ)
+function calculateAge() {
+    let year = document.getElementById("birthYear").value;
+    if(year) {
+        document.getElementById("mAge").value = 2026 - parseInt(year);
     }
 }
+
+function resetForm() {
+    document.getElementById("editIndex").value = "-1";
+    document.getElementById("mName").value = "";
+    document.getElementById("mPhone").value = "";
+    document.getElementById("mChrist").value = "";
+    document.getElementById("mNotes").value = "";
+    document.getElementById("formActionTitle").textContent = "📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ";
+    document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
+}
+
+// ሲስተሙ መጀመሪያ ሲከፈት ሰንጠረዦቹን ባዶ አድርጎ ያዘጋጃል
+window.addEventListener('load', () => {
+    renderMembers();
+    renderTsiwa();
+});
