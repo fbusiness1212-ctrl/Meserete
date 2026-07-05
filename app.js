@@ -6,6 +6,7 @@ function checkLogin() {
     if (user === "Meserete-Hywet" && pass === "2116") {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
+        fetchMembersFromFirebase(); // ገጹ ሲከፈት መረጃዎችን ከዳታቤዝ ያመጣል
     } else {
         alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
@@ -19,12 +20,34 @@ function handleLogout() {
     document.getElementById("adminPassword").value = "";
 }
 
+// 🌐 የ Firebase ዳታቤዝ አድራሻ (የአንተ ትክክለኛ ሊንክ ተገጥሞለታል)
+const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
+
 // 📂 የአባላት እና የፅዋ መረጃዎችን ለመያዝ
 let members = [];
 let tsiwaList = [];
 let currentViewingIndex = -1;
 
-// 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ
+// 📥 መረጃዎችን ከ Firebase ዳታቤዝ ማውረጃ ፈንክሽን
+function fetchMembersFromFirebase() {
+    fetch(`${FIREBASE_URL}/members.json`)
+    .then(response => response.json())
+    .then(data => {
+        members = [];
+        if (data) {
+            // ከዳታቤዝ የመጣውን መረጃ ወደ Array መቀየሪያ
+            Object.keys(data).forEach(key => {
+                let member = data[key];
+                member.firebaseKey = key; // ለእያንዳንዱ አባል መለያ ቁልፍ መስጠት
+                members.push(member);
+            });
+        }
+        renderMembers();
+    })
+    .catch(error => console.error("መረጃ ከዳታቤዝ ሲመጣ ስህተት ተፈጥሯል:", error));
+}
+
+// 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ (ወደ Firebase ይልካል)
 function addMember() {
     let name = document.getElementById("mName").value.trim();
     let phone = document.getElementById("mPhone").value.trim();
@@ -53,8 +76,8 @@ function addMember() {
         return;
     }
 
-    // 🕒 አባል የተመዘገበበትን ትክክለኛ የኢትዮጵያ/የዛሬ ቀን መያዣ (ለ3 ወር ማስጠንቀቂያ ክትትል)
     let todayDate = new Date();
+    let editIdx = parseInt(document.getElementById("editIndex").value);
 
     let memberData = {
         name, phone, christName, age, gender, blood, qurbanStatus,
@@ -63,25 +86,39 @@ function addMember() {
         address: `${loc} ክፍለ ከተማ፣ ወረዳ ${wereda}፣ የቤት ቁጥር ${houseNum} (${sefer})`,
         godfather: `${godName} (ስልክ: ${godPhone})`,
         notes: notes || "የለም",
-        registrationDate: todayDate.toISOString(), // የገባበት ቀን በቋሚነት ይመዘገባል
         qurbanTrack: { checked: qurbanStatus === "በቅዱስ ቁርባን ያለ", lastUpdated: "በምዝገባ ወቅት" }
     };
 
-    let editIdx = parseInt(document.getElementById("editIndex").value);
     if (editIdx === -1) {
-        members.push(memberData);
-        alert("አባል በተሳካ ሁኔታ በፎልደር ውስጥ ተመዝግቧል!");
+        // 1️⃣ አዲስ ምዝገባ ከሆነ -> ቀጥታ ወደ Firebase መላክ (POST)
+        memberData.registrationDate = todayDate.toISOString();
+        
+        fetch(`${FIREBASE_URL}/members.json`, {
+            method: "POST",
+            body: JSON.stringify(memberData)
+        })
+        .then(() => {
+            alert("አባል በተሳካ ሁኔታ በዳታቤዝ ውስጥ ተመዝግቧል!");
+            fetchMembersFromFirebase(); // ገጹን በዳታቤዝ ማደሻ
+        });
     } else {
-        // መረጃው ሲሻሻል የድሮውን መመዝገቢያ ቀን እንዳያጠፋው ማረጋገጫ
+        // 2️⃣ ነባር መረጃ ማሻሻያ ከሆነ -> በ Firebase ላይ ማደስ (PUT)
+        let firebaseKey = members[editIdx].firebaseKey;
         memberData.registrationDate = members[editIdx].registrationDate || todayDate.toISOString();
-        members[editIdx] = memberData;
-        alert("የአባል ማኅደር ፋይል በተሳካ ሁኔታ ተሻሽሏል!");
-        document.getElementById("editIndex").value = "-1";
+        
+        fetch(`${FIREBASE_URL}/members/${firebaseKey}.json`, {
+            method: "PUT",
+            body: JSON.stringify(memberData)
+        })
+        .then(() => {
+            alert("የአባል ማኅደር በዳታቤዝ ላይ በተሳካ ሁኔታ ተሻሽሏል!");
+            document.getElementById("editIndex").value = "-1";
+            fetchMembersFromFirebase();
+        });
     }
 
     resetForm();
     goBack();
-    renderMembers();
 }
 
 // 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ (ከቀለም እና የ3 ወር ማስጠንቀቂያ ጋር)
@@ -97,27 +134,24 @@ function renderMembers() {
     let today = new Date();
 
     members.forEach((m, index) => {
-        let rowClass = "";
         let rowStyle = "";
         let warningBadge = "";
 
-        // 1️⃣ ቅዱስ ቁርባን የተቀበለ ካልሆነ (በቅዱስ ቁርባን የሌለ ከሆነ) ሙሉ መስመሩን ቀይ ማድረጊያ
         if (m.qurbanStatus !== "በቅዱስ ቁርባን ያለ") {
             rowStyle = "background-color: #ffebee; color: #c62828; font-weight: 500; border-bottom: 1px solid #ffcdd2;";
         }
 
-        // 2️⃣ ከተመዘገበ 3 ወር (90 ቀን) ያለፈው መሆኑን ማረጋገጫ እና ማስጠንቀቂያ ማውጫ
         if (m.registrationDate) {
             let regDate = new Date(m.registrationDate);
             let timeDiff = today.getTime() - regDate.getTime();
-            let daysDiff = timeDiff / (1000 * 3600 * 24); // ወደ ቀናት መቀየሪያ
+            let daysDiff = timeDiff / (1000 * 3600 * 24);
 
             if (daysDiff >= 90) {
                 warningBadge = ` <span style="background-color: #d32f2f; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 6px; display: inline-block; border: 1px solid white;">⚠️ የ3 ወር ማስጠንቀቂያ!</span>`;
             }
         }
 
-        tbody.innerHTML += `<tr style="${rowStyle}" class="${rowClass}">
+        tbody.innerHTML += `<tr style="${rowStyle}">
             <td>${index + 1}</td>
             <td><b>${m.name}</b> ${warningBadge}</td>
             <td>${m.phone}</td>
@@ -146,7 +180,7 @@ function searchMember() {
     }
 }
 
-// 📜 የአባል ማኅደር ፋይልን በፖፕ-አፕ (Modal) መክፈቻ
+// 📜 የአባል ማኅደር ፋይልን መክፈቻ
 function viewProfile(index) {
     currentViewingIndex = index;
     let m = members[index];
@@ -167,18 +201,7 @@ function closeProfile() {
     document.getElementById("profileModal").style.display = "none";
 }
 
-// 🗓️ የወርሃዊ ቁርባን ክትትል ማስተካከያ
-function toggleMonthlyQurban() {
-    if(currentViewingIndex !== -1) {
-        let checked = document.getElementById("modalQurbanCheck").checked;
-        members[currentViewingIndex].qurbanTrack.checked = checked;
-        members[currentViewingIndex].qurbanTrack.lastUpdated = checked ? "የዚህ ወር ተፈጽሟል" : "ተደናቅፏል / አልቆረበም";
-        document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${members[currentViewingIndex].qurbanTrack.lastUpdated}`;
-        renderMembers();
-    }
-}
-
-// ✏️ የአባል ፋይል ማሻሻያ (Edit) ወደ ፎርም መጫኛ
+// ✏️ የአባል ፋይል ማሻሻያ (Edit)
 function editMember(index) {
     let m = members[index];
     document.getElementById("editIndex").value = index;
@@ -194,45 +217,6 @@ function editMember(index) {
     document.getElementById("formActionTitle").textContent = "✏️ የአባል ማኅደር ፋይል ማሻሻያ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 የተቀየረውን ፋይል አሻሽለህ መዝግብ";
     openFolder('newRegistrationFolder');
-}
-
-// 🏆 ፅዋ መዝገብ (ሴንተሬዝ) ስራዎች
-function addTsiwa() {
-    let tName = document.getElementById("tName").value.trim();
-    let tMember = document.getElementById("tMember").value.trim();
-    let d = document.getElementById("ethDay").value;
-    let m = document.getElementById("ethMonth").value;
-    let y = document.getElementById("ethYear").value;
-
-    if(!tName || !tMember) {
-        alert("እባክዎ የፅዋ ስምና የባለዕጣውን አባል ስም ያስገቡ!");
-        return;
-    }
-
-    tsiwaList.push({ name: tName, member: tMember, date: `${m} ${d} ቀን ${y} ዓ.ም` });
-    alert("የፅዋ ዕጣ በተሳካ ሁኔታ ተመዝግቧል!");
-    
-    document.getElementById("tName").value = "";
-    document.getElementById("tMember").value = "";
-    renderTsiwa();
-}
-
-function renderTsiwa() {
-    let tbody = document.getElementById("tsiwaTableBody");
-    tbody.innerHTML = "";
-    if(tsiwaList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የፅዋ ዕጣ አልተመዘገበም።</td></tr>`;
-        return;
-    }
-    tsiwaList.forEach((t, index) => {
-        tbody.innerHTML += `<tr>
-            <td>${index + 1}</td>
-            <td><b>${t.name}</b></td>
-            <td>${t.member}</td>
-            <td>${t.date}</td>
-            <td style="text-align:center;"><button onclick="tsiwaList.splice(${index},1); renderTsiwa();" style="background:#c62828; color:white; border:none; padding:3px 7px; border-radius:3px; cursor:pointer; font-size:11px;">🔄 ዕጣ ቀይር</button></td>
-        </tr>`;
-    });
 }
 
 // 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ)
@@ -252,9 +236,3 @@ function resetForm() {
     document.getElementById("formActionTitle").textContent = "📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
 }
-
-// ሲስተሙ መጀመሪያ ሲከፈት ሰንጠረዦቹን ባዶ አድርጎ ያዘጋጃል
-window.addEventListener('load', () => {
-    renderMembers();
-    renderTsiwa();
-});
