@@ -385,11 +385,14 @@ function toggleMonthlyQurban() {
     });
 }
 
-// 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ የተስተካከለ)
+// 🧮 የዕድሜ ስሌት (በኢትዮጵያ አቆጣጠር 2018 ዓ.ም መነሻ በማድረግ የተስተካከለ)
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
-        let age = 2026 - parseInt(yearInput); 
+        // የአሁኑ የኢትዮጵያ ዓመተ ምሕረት 2018 ነው
+        let currentEthYear = 2018; 
+        let age = currentEthYear - parseInt(yearInput); 
+        
         if(age >= 0) {
             document.getElementById("mAge").value = age;
         } else {
