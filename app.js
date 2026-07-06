@@ -418,13 +418,14 @@ function fetchTsiwaFromFirebase() {
     });
 }
 
-// 📝 አዲስ የፅዋ ዕጣ ለመመዝገብ 
+// 📝 አዲስ የፅዋ ዕጣ ለመመዝገብ እና ለማሻሻያ
 function addTsiwa() {
     let tName = document.getElementById("tName").value.trim();
     let tMember = document.getElementById("tMember").value.trim();
     let day = document.getElementById("ethDay").value;
     let month = document.getElementById("ethMonth").value;
     let year = document.getElementById("ethYear").value;
+    let editKey = document.getElementById("tsiwaEditKey").value; // የማሻሻያ መለያ
 
     if (!tName || !tMember) {
         alert("እባክዎ የፅዋውን ስም እና የአባሉን ስም ያስገቡ!");
@@ -437,17 +438,31 @@ function addTsiwa() {
         date: `${day}/${month}/${year}`
     };
 
-    fetch(`${FIREBASE_URL}/tsiwa.json`, {
-        method: "POST",
-        body: JSON.stringify(tsiwaData)
-    })
-    .then(() => {
-        alert("የፅዋ ዕጣ በተሳካ ሁኔታ ተመዝግቧል!");
-        document.getElementById("tName").value = "";
-        document.getElementById("tMember").value = "";
-        fetchTsiwaFromFirebase();
-    })
-    .catch(error => alert("የፅዋ መረጃ ሲመዘገብ ስህተት ተፈጥሯል፦ " + error));
+    if (editKey === "") {
+        // ➕ አዲስ መመዝገቢያ ከሆነ (የነበረው ኦሪጅናል POST)
+        fetch(`${FIREBASE_URL}/tsiwa.json`, {
+            method: "POST",
+            body: JSON.stringify(tsiwaData)
+        })
+        .then(() => {
+            alert("የፅዋ ዕጣ በተሳካ ሁኔታ ተመዝግቧል!");
+            clearTsiwaForm();
+            fetchTsiwaFromFirebase();
+        })
+        .catch(error => alert("የፅዋ መረጃ ሲመዘገብ ስህተት ተፈጥሯል፦ " + error));
+    } else {
+        // ✏️ የነበረን ለማሻሻል ከሆነ (አዲሱ PUT)
+        fetch(`${FIREBASE_URL}/tsiwa/${editKey}.json`, {
+            method: "PUT",
+            body: JSON.stringify(tsiwaData)
+        })
+        .then(() => {
+            alert("የፅዋ ዕጣ መረጃ በተሳካ ሁኔታ ተሻሽሏል!");
+            clearTsiwaForm();
+            fetchTsiwaFromFirebase();
+        })
+        .catch(error => alert("የፅዋ መረጃ ሲታደስ ስህተት ተፈጥሯል፦ " + error));
+    }
 }
 
 // 📋 የፅዋ ዕጣዎችን ዝርዝር ማሳያ
@@ -466,22 +481,49 @@ function renderTsiwa() {
             <td><b>${t.tsiwaName}</b></td>
             <td>${t.memberName}</td>
             <td>${t.date}</td>
-            <td style="text-align:center;"><button onclick="deleteTsiwa('${t.firebaseKey}')" style="background:#c62828; color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer;">ሰርዝ</button></td>
+            <td style="text-align:center; display: flex; gap: 5px; justify-content: center;">
+                <button onclick="editTsiwa(${index})" style="background:#ffa000; color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer;">አስተካክል</button>
+                <button onclick="deleteTsiwa('${t.firebaseKey}')" style="background:#c62828; color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer;">ሰርዝ</button>
+            </td>
         </tr>`;
     });
 }
 
-// 🗑️ የፅዋ ዕጣ መሰረዣ ፈንክሽን
-function deleteTsiwa(key) {
-    if (confirm("ይህንን የፅዋ ዕጣ መዝገብ መሰረዝ ይፈልጋሉ?")) {
-        fetch(`${FIREBASE_URL}/tsiwa/${key}.json`, {
-            method: "DELETE"
-        })
-        .then(() => {
-            alert("የፅዋ መዝገቡ ተሰርዟል!");
-            fetchTsiwaFromFirebase();
-        });
+// ✏️ የፅዋ መረጃን ወደ ፎርሙ መልሶ ማሻሻያ ላይ ማድረጊያ
+function editTsiwa(index) {
+    let t = tsiwaList[index];
+    document.getElementById("tsiwaEditKey").value = t.firebaseKey;
+    document.getElementById("tName").value = t.tsiwaName;
+    document.getElementById("tMember").value = t.memberName;
+
+    // ቀኑን ከፋፍሎ ወደ select ፎርም መመለስ
+    if (t.date && t.date.includes("/")) {
+        let parts = t.date.split("/");
+        if (parts.length === 3) {
+            document.getElementById("ethDay").value = parts[0];
+            document.getElementById("ethMonth").value = parts[1];
+            document.getElementById("ethYear").value = parts[2];
+        }
     }
+
+    document.getElementById("tsiwaFormTitle").textContent = "✏️ የፅዋ ዕጣ ማሻሻያ ቅጽ";
+    document.getElementById("tsiwaSubmitBtn").textContent = "💾 የተቀየረውን ፅዋ አሻሽል";
+    document.getElementById("tsiwaSubmitBtn").style.background = "#ffa000";
+}
+
+// 🧹 የፅዋ ቅጽን ማጽጃ 
+function clearTsiwaForm() {
+    document.getElementById("tsiwaEditKey").value = "";
+    document.getElementById("tName").value = "";
+    document.getElementById("tMember").value = "";
+    document.getElementById("tsiwaFormTitle").textContent = "[+] አዲስ የፅዋ ዕጣ መዝግብ";
+    document.getElementById("tsiwaSubmitBtn").textContent = "ፅዋ መዝግብ";
+    document.getElementById("tsiwaSubmitBtn").style.background = "#1a2a3a";
+    
+    // ቀናትን ወደ መጀመሪያው መመለሻ
+    document.getElementById("ethDay").value = "1";
+    document.getElementById("ethMonth").value = "መስከረም";
+    document.getElementById("ethYear").value = "2018";
 }
 
 // 🔄 ፎርሙን ባዶ ማድረጊያ
