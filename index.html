@@ -107,11 +107,13 @@
             </div>
         </div>
 
-        <div id="viewTsiwaFolder" class="file-view">
+                <div id="viewTsiwaFolder" class="file-view">
             <button class="back-btn" onclick="goBack()">⬅ ወደ ፎልደሮች ተመለስ</button>
             <h3 style="margin-top:0; color:#1a2a3a; font-size:15px;">📂 መዝገብ ፎልደር > የፅዋ ዕጣዎች (ሴንተሬዝ)</h3>
             <div style="background:#f9f9f9; padding:10px; border-radius:5px; margin-bottom:15px; border:1px solid #ddd;">
                 <h4 id="tsiwaFormTitle" style="margin:0 0 8px 0; font-size:12px; color:#333;">[+] አዲስ የፅዋ ዕጣ መዝግብ</h4>
+                <input type="hidden" id="tsiwaEditKey" value="">
+                
                 <div class="row"><div class="label">የፅዋው ስም:</div><input type="text" id="tName" placeholder="ማርያም..." class="input-field"></div>
                 <div class="row"><div class="label">የአባሉ ስም:</div><input type="text" id="tMember" class="input-field"></div>
                 <div class="row">
@@ -132,7 +134,7 @@
                             <th>የፅዋው ስም</th>
                             <th>የአባሉ ስም</th>
                             <th>የመዘከሪያ ቀን (በኢትዮጵያ)</th>
-                            <th style="text-align: center;">ድርጊት / ሁኔታ</th>
+                            <th style="text-align: center;">ማስተካከያ / ድርጊት</th>
                         </tr>
                     </thead>
                     <tbody id="tsiwaTableBody"></tbody>
