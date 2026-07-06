@@ -7,6 +7,7 @@ function checkLogin() {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
         fetchMembersFromFirebase(); // ገጹ ሲከፈት መረጃዎችን ከዳታቤዝ ያመጣል
+        fetchTsiwaFromFirebase(); // የፅዋ መረጃዎችንም ያመጣል
     } else {
         alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
@@ -274,6 +275,12 @@ function viewProfile(index) {
         closeProfile();
         editMember(index);
     };
+
+    // 🗑️ የአባል ፋይል መደለቻ አዝራር ክንውን
+    document.getElementById("modalDeleteBtn").onclick = function() {
+        deleteMember(index);
+    };
+
     document.getElementById("profileModal").style.display = "flex";
 }
 
@@ -296,13 +303,13 @@ function editMember(index) {
     document.getElementById("mBlood").value = m.blood || "ያልታወቀ";
     document.getElementById("mQurbanStatus").value = m.qurbanStatus || "በቅዱስ ቁርባን ያለ";
     
-    if(m.birthDay) document.getElementById("birthDay").value = m.birthDay;
-    if(m.birthMonth) document.getElementById("birthMonth").value = m.birthMonth;
-    if(m.birthYear) document.getElementById("birthYear").value = m.birthYear;
+    document.getElementById("birthDay").value = m.birthDay || "1";
+    document.getElementById("birthMonth").value = m.birthMonth || "መስከረም";
+    document.getElementById("birthYear").value = m.birthYear || "2000";
     
-    if(m.qDay) document.getElementById("qDay").value = m.qDay;
-    if(m.qMonth) document.getElementById("qMonth").value = m.qMonth;
-    if(m.qYear) document.getElementById("qYear").value = m.qYear;
+    document.getElementById("qDay").value = m.qDay || "ቀን";
+    document.getElementById("qMonth").value = m.qMonth || "ወር";
+    document.getElementById("qYear").value = m.qYear || "ዓመት";
 
     // ክፍል ፪
     document.getElementById("mJobStatus").value = m.job || "";
@@ -344,6 +351,22 @@ function editMember(index) {
     openFolder('newRegistrationFolder');
 }
 
+// 🗑️ ፋይል ለመሰረዝ (Delete Function)
+function deleteMember(index) {
+    let m = members[index];
+    if (confirm(`የአባሉን "${m.name}" ሙሉ የቪዲዮ/ማኅደር ፋይል ከዳታቤዝ ላይ ሙሉ በሙሉ መሰረዝ ይፈልጋሉ?`)) {
+        fetch(`${FIREBASE_URL}/members/${m.firebaseKey}.json`, {
+            method: "DELETE"
+        })
+        .then(() => {
+            alert("የአባሉ ፋይል በተሳካ ሁኔታ ተሰርዟል!");
+            closeProfile();
+            fetchMembersFromFirebase();
+        })
+        .catch(error => alert("ፋይል ሲሰረዝ ስህተት አጋጥሟል፦ " + error));
+    }
+}
+
 // 🗓️ በሞዳል ውስጥ የቁርባን ሁኔታን መለወጫ
 function toggleMonthlyQurban() {
     if (currentViewingIndex === -1) return;
@@ -377,6 +400,89 @@ function calculateAge() {
         } else {
             document.getElementById("mAge").value = "";
         }
+    }
+}
+
+// ☕ የፅዋ ዕጣ መረጃዎችን ከዳታቤዝ ማውረጃ
+function fetchTsiwaFromFirebase() {
+    fetch(`${FIREBASE_URL}/tsiwa.json`)
+    .then(response => response.json())
+    .then(data => {
+        tsiwaList = [];
+        if (data) {
+            Object.keys(data).forEach(key => {
+                let tsiwa = data[key];
+                tsiwa.firebaseKey = key;
+                tsiwaList.push(tsiwa);
+            });
+        }
+        renderTsiwa();
+    });
+}
+
+// 📝 አዲስ የፅዋ ዕጣ ለመመዝገብ (የነበረውን ችግር የሚፈታ ፈንክሽን)
+function addTsiwa() {
+    let tName = document.getElementById("tName").value.trim();
+    let tMember = document.getElementById("tMember").value.trim();
+    let day = document.getElementById("ethDay").value;
+    let month = document.getElementById("ethMonth").value;
+    let year = document.getElementById("ethYear").value;
+
+    if (!tName || !tMember) {
+        alert("እባክዎ የፅዋውን ስም እና የአባሉን ስም ያስገቡ!");
+        return;
+    }
+
+    let tsiwaData = {
+        tsiwaName: tName,
+        memberName: tMember,
+        date: `${day}/${month}/${year}`
+    };
+
+    fetch(`${FIREBASE_URL}/tsiwa.json`, {
+        method: "POST",
+        body: JSON.stringify(tsiwaData)
+    })
+    .then(() => {
+        alert("የፅዋ ዕጣ በተሳካ ሁኔታ ተመዝግቧል!");
+        document.getElementById("tName").value = "";
+        document.getElementById("tMember").value = "";
+        fetchTsiwaFromFirebase();
+    })
+    .catch(error => alert("የፅዋ መረጃ ሲመዘገብ ስህተት ተፈጥሯል፦ " + error));
+}
+
+// 📋 የፅዋ ዕጣዎችን ዝርዝር በሰንጠረዥ ማሳያ
+function renderTsiwa() {
+    let tbody = document.getElementById("tsiwaTableBody");
+    tbody.innerHTML = "";
+
+    if (tsiwaList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:gray;">ምንም የተመዘገበ የፅዋ ዕጣ የለም።</td></tr>`;
+        return;
+    }
+
+    tsiwaList.forEach((t, index) => {
+        tbody.innerHTML += `<tr>
+            <td>${index + 1}</td>
+            <td><b>${t.tsiwaName}</b></td>
+            <td>${t.memberName}</td>
+            <td>${t.date}</td>
+            <td style="text-align:center;"><button onclick="deleteTsiwa('${t.firebaseKey}')" style="background:#c62828; color:white; border:none; padding:3px 8px; border-radius:3px; cursor:pointer;">ሰርዝ</button></td>
+        </tr>`;
+    });
+}
+
+// 🗑️ የፅዋ ዕጣ መሰረዣ ፈንክሽን
+function deleteTsiwa(key) {
+    if (confirm("ይህንን የፅዋ ዕጣ መዝገብ መሰረዝ ይፈልጋሉ?")) {
+        fetch(`${FIREBASE_URL}/tsiwa/${key}.json`, {
+            method: "DELETE"
+        })
+        .then(() => {
+            alert("የፅዋ መዝገቡ ተሰርዟል!");
+            fetchTsiwaFromFirebase();
+        });
     }
 }
 
