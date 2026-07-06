@@ -20,7 +20,7 @@ function handleLogout() {
     document.getElementById("adminPassword").value = "";
 }
 
-// 🌐 የ Firebase ዳታቤዝ አድራሻ
+// 🌐 የ Firebase ዳታቤዝ አድራሻ 
 const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
 
 // 📂 የአባላት እና የፅዋ መረጃዎችን ለመያዝ
@@ -37,7 +37,7 @@ function fetchMembersFromFirebase() {
         if (data) {
             Object.keys(data).forEach(key => {
                 let member = data[key];
-                member.firebaseKey = key; 
+                member.firebaseKey = key; // ለእያንዳንዱ አባል መለያ ቁልፍ መስጠት
                 members.push(member);
             });
         }
@@ -69,6 +69,14 @@ function addMember() {
     let godName = document.getElementById("mGodName").value;
     let godPhone = document.getElementById("mGodPhone").value;
     let notes = document.getElementById("mNotes").value;
+    
+    // 👪 ክፍል ፭፡ የቤተሰብ አዲስ መረጃዎች
+    let fatherName = document.getElementById("mFatherName").value.trim();
+    let fatherChrist = document.getElementById("mFatherChrist").value.trim();
+    let fatherPhone = document.getElementById("mFatherPhone").value.trim();
+    let motherName = document.getElementById("mMotherName").value.trim();
+    let motherChrist = document.getElementById("mMotherChrist").value.trim();
+    let motherPhone = document.getElementById("mMotherPhone").value.trim();
 
     if(!name || !phone) {
         alert("እባክዎ ቢያንስ ሙሉ ስምና ስልክ ቁጥር ያስገቡ!");
@@ -85,7 +93,18 @@ function addMember() {
         address: `${loc} ክፍለ ከተማ፣ ወረዳ ${wereda}፣ የቤት ቁጥር ${houseNum} (${sefer})`,
         godfather: `${godName} (ስልክ: ${godPhone})`,
         notes: notes || "የለም",
-        qurbanTrack: { checked: qurbanStatus === "በቅዱስ ቁርባን ያለ", lastUpdated: "በምዝገባ ወቅት" }
+        familyDetails: {
+            fatherName: fatherName || "የተመዘገበ የለም",
+            fatherChrist: fatherChrist || "የተመዘገበ የለም",
+            fatherPhone: fatherPhone || "የተመዘገበ የለም",
+            motherName: motherName || "የተመዘገበ የለም",
+            motherChrist: motherChrist || "የተመዘገበ የለም",
+            motherPhone: motherPhone || "የተመዘገበ የለም"
+        },
+        qurbanTrack: { 
+            checked: qurbanStatus === "በቅዱስ ቁርባን ያለ", 
+            lastUpdated: editIdx === -1 ? "በምዝገባ ወቅት" : (members[editIdx].qurbanTrack ? members[editIdx].qurbanTrack.lastUpdated : "በምዝገባ ወቅት")
+        }
     };
 
     if (editIdx === -1) {
@@ -97,7 +116,7 @@ function addMember() {
         })
         .then(() => {
             alert("አባል በተሳካ ሁኔታ በዳታቤዝ ውስጥ ተመዝግቧል!");
-            fetchMembersFromFirebase(); 
+            fetchMembersFromFirebase();
         });
     } else {
         let firebaseKey = members[editIdx].firebaseKey;
@@ -118,7 +137,7 @@ function addMember() {
     goBack();
 }
 
-// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ
+// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ (ከቀለም እና የ3 ወር አውቶማቲክ ማስጠንቀቂያ ጋር)
 function renderMembers() {
     let tbody = document.getElementById("memberTableBody");
     tbody.innerHTML = "";
@@ -133,17 +152,21 @@ function renderMembers() {
     members.forEach((m, index) => {
         let rowStyle = "";
         let warningBadge = "";
+        let isDelayed = false;
 
+        // 1. የቁርባን ሁኔታ "በቅዱስ ቁርባን ያለ" ካልተባለ በቀይ ይደምቃል
         if (m.qurbanStatus !== "በቅዱስ ቁርባን ያለ") {
             rowStyle = "background-color: #ffebee; color: #c62828; font-weight: 500; border-bottom: 1px solid #ffcdd2;";
+            isDelayed = true;
         }
 
+        // 2. ከ3 ወር (90 ቀን) በላይ የዘገየ ከሆነ ⚠️ ምልክት በራስ ሰር ያደርጋል
         if (m.registrationDate) {
             let regDate = new Date(m.registrationDate);
             let timeDiff = today.getTime() - regDate.getTime();
             let daysDiff = timeDiff / (1000 * 3600 * 24);
 
-            if (daysDiff >= 90) {
+            if (daysDiff >= 90 && isDelayed) {
                 warningBadge = ` <span style="background-color: #d32f2f; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 6px; display: inline-block; border: 1px solid white;">⚠️ የ3 ወር ማስጠንቀቂያ!</span>`;
             }
         }
@@ -177,18 +200,18 @@ function searchMember() {
     }
 }
 
-// 📜 የአባል ማኅደር ፋይልን መክፈቻ
+// 📜 የአባል ማኅደር ፋይልን መክፈቻ (ክፍል ፭ የቤተሰብ መረጃን ጨምሮ)
 function viewProfile(index) {
     currentViewingIndex = index;
     let m = members[index];
-    let content = `** የግል መረጃ **\nሙሉ ስም: ${m.name}\nየክርስትና ስም: ${m.christName}\nጾታ: ${m.gender} | ዕድሜ: ${m.age} | የደም ዓይነት: ${m.blood}\nትውልድ ዘመን: ${m.birthDate}\n\n** አድራሻ እና ሥራ **\nስልክ: ${m.phone}\nመኖሪያ: ${m.address}\n\n** መንፈሳዊ መረጃ **\nየንሥሐ አባት: ${m.godfather}\nየቁርባን ሁኔታ: ${m.qurbanStatus} (የመጨረሻ: ${m.lastQurbanDate})\n\n** ተጨማሪ ማስታወሻ **\n${m.notes}`;
+    
+    let fam = m.familyDetails || { fatherName: "የለም", fatherChrist: "የለም", fatherPhone: "የለም", motherName: "የለም", motherChrist: "የለም", motherPhone: "የለም" };
+
+    let content = `** የግል መረጃ **\nሙሉ ስም: ${m.name}\nየክርስትና ስም: ${m.christName}\nጾታ: ${m.gender} | ዕድሜ: ${m.age} | የደም ዓይነት: ${m.blood}\nትውልድ ዘመን: ${m.birthDate}\n\n** አድራሻ እና ሥራ **\nስልክ: ${m.phone}\nመኖሪያ: ${m.address}\n\n** ክፍል ፭፡ የቤተሰብ ሁኔታ መረጃ **\nየአባት ስም: ${fam.fatherName} | ክርስትና ስም: ${fam.fatherChrist} | ስልክ: ${fam.fatherPhone}\nየእናት ስም: ${fam.motherName} | ክርስትና ስም: ${fam.motherChrist} | ስልክ: ${fam.motherPhone}\n\n** መንፈሳዊ መረጃ **\nየንሥሐ አባት: ${m.godfather}\nየቁርባን ሁኔታ: ${m.qurbanStatus} (የመጨረሻ: ${m.lastQurbanDate})\n\n** ተጨማሪ ማስታወሻ **\n${m.notes}`;
     
     document.getElementById("profileContent").textContent = content;
-    
-    if(m.qurbanTrack) {
-        document.getElementById("modalQurbanCheck").checked = m.qurbanTrack.checked || false;
-        document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${m.qurbanTrack.lastUpdated || "በምዝገባ ወቅት"}`;
-    }
+    document.getElementById("modalQurbanCheck").checked = m.qurbanTrack ? m.qurbanTrack.checked : false;
+    document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${m.qurbanTrack ? m.qurbanTrack.lastUpdated : "የለም"}`;
     
     document.getElementById("modalEditBtn").onclick = function() {
         closeProfile();
@@ -214,28 +237,45 @@ function editMember(index) {
     document.getElementById("mQurbanStatus").value = m.qurbanStatus;
     document.getElementById("mNotes").value = m.notes;
     
-    // የልደት ዓመቱን ከዳታው ላይ መርጦ Dropdown ማስተካከያ
-    if(m.birthDate) {
-        let parts = m.birthDate.split('/');
-        if(parts.length === 3) {
-            document.getElementById("birthDay").value = parts[0];
-            document.getElementById("birthMonth").value = parts[1];
-            document.getElementById("birthYear").value = parts[2];
-        }
-    }
+    let fam = m.familyDetails || {};
+    document.getElementById("mFatherName").value = fam.fatherName || "";
+    document.getElementById("mFatherChrist").value = fam.fatherChrist || "";
+    document.getElementById("mFatherPhone").value = fam.fatherPhone || "";
+    document.getElementById("mMotherName").value = fam.motherName || "";
+    document.getElementById("mMotherChrist").value = fam.motherChrist || "";
+    document.getElementById("mMotherPhone").value = fam.motherPhone || "";
     
     document.getElementById("formActionTitle").textContent = "✏️ የአባል ማኅደር ፋይል ማሻሻያ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 የተቀየረውን ፋይል አሻሽለህ መዝግብ";
     openFolder('newRegistrationFolder');
 }
 
+// 🗓️ በሞዳል ውስጥ የቁርባን ሁኔታን መለወጫ
+function toggleMonthlyQurban() {
+    if (currentViewingIndex === -1) return;
+    let m = members[currentViewingIndex];
+    let isChecked = document.getElementById("modalQurbanCheck").checked;
+    let todayStr = new Date().toLocaleDateString('am-ET') + " እረፍት";
+
+    m.qurbanStatus = isChecked ? "በቅዱስ ቁርባን ያለ" : "ከቆረበ ቆይቷል";
+    m.qurbanTrack = { checked: isChecked, lastUpdated: todayStr };
+
+    fetch(`${FIREBASE_URL}/members/${m.firebaseKey}.json`, {
+        method: "PUT",
+        body: JSON.stringify(m)
+    })
+    .then(() => {
+        document.getElementById("modalLastUpdatedText").textContent = `መጨረሻ የተሻሻለው፦ ${todayStr}`;
+        fetchMembersFromFirebase();
+    });
+}
+
 // 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ)
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
-        let gregorianYear = new Date().getFullYear(); // 2026
-        let currentEthiopianYear = gregorianYear - 8; // 2018 ዓ.ም
-        
+        let gregorianYear = new Date().getFullYear(); 
+        let currentEthiopianYear = gregorianYear - 8; 
         let age = currentEthiopianYear - parseInt(yearInput);
         
         if(age >= 0) {
@@ -252,11 +292,17 @@ function resetForm() {
     document.getElementById("mPhone").value = "";
     document.getElementById("mChrist").value = "";
     document.getElementById("mNotes").value = "";
+    document.getElementById("mFatherName").value = "";
+    document.getElementById("mFatherChrist").value = "";
+    document.getElementById("mFatherPhone").value = "";
+    document.getElementById("mMotherName").value = "";
+    document.getElementById("mMotherChrist").value = "";
+    document.getElementById("mMotherPhone").value = "";
     document.getElementById("formActionTitle").textContent = "📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
 }
 
-// 🔄 ገጹ ሲጫን የ Dropdown መሙያዎችን ማስነሻ
+// DOM Loading
 window.addEventListener('DOMContentLoaded', () => {
     let dSel = document.getElementById('ethDay');
     let mSel = document.getElementById('ethMonth');
@@ -284,7 +330,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if(qMonthSel) qMonthSel.innerHTML += `<option value="${m}">${m}</option>`;
     });
 
-    let currentEthYear = new Date().getFullYear() - 8; // 2018 ዓ.ም
+    let currentEthYear = new Date().getFullYear() - 8; 
 
     if(bySel) {
         bySel.innerHTML = "";
