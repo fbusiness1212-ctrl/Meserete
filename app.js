@@ -1,3 +1,11 @@
+// 🌐 የ Firebase ዳታቤዝ አድራሻ 
+const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com";
+
+// 📂 ዳታዎችን ለመያዝ
+let members = [];
+let tsiwaList = [];
+let currentViewingIndex = -1;
+
 // 🔐 የአድሚን መግቢያ ማረጋገጫ
 function checkLogin() {
     var user = document.getElementById("adminUsername").value;
@@ -6,8 +14,8 @@ function checkLogin() {
     if (user === "Meserete-Hywet" && pass === "2116") {
         document.getElementById("lockScreen").style.display = "none";
         document.getElementById("mainDashboard").style.display = "block";
-        fetchMembersFromFirebase(); // ገጹ ሲከፈት መረጃዎችን ከዳታቤዝ ያመጣል
-        fetchTsiwaFromFirebase(); // የፅዋ መረጃዎችንም ያመጣል
+        fetchMembersFromFirebase(); 
+        fetchTsiwaFromFirebase();   
     } else {
         alert("የተሳሳተ የአድሚን ስም ወይም የይለፍ ቃል አስገብተዋል!");
     }
@@ -21,15 +29,7 @@ function handleLogout() {
     document.getElementById("adminPassword").value = "";
 }
 
-// 🌐 የ Firebase ዳታቤዝ አድራሻ 
-const FIREBASE_URL = "https://meserete-hyewt-default-rtdb.firebaseio.com/";
-
-// 📂 የአባላት እና የፅዋ መረጃዎችን ለመያዝ
-let members = [];
-let tsiwaList = [];
-let currentViewingIndex = -1;
-
-// 📥 መረጃዎችን ከ Firebase ዳታቤዝ ማውረጃ ፈንክሽን
+// 📥 መረጃዎችን ከ Firebase ዳታቤዝ ማውረጃ
 function fetchMembersFromFirebase() {
     fetch(`${FIREBASE_URL}/members.json`)
     .then(response => response.json())
@@ -38,7 +38,7 @@ function fetchMembersFromFirebase() {
         if (data) {
             Object.keys(data).forEach(key => {
                 let member = data[key];
-                member.firebaseKey = key; // ለእያንዳንዱ አባል መለያ ቁልፍ መስጠት
+                member.firebaseKey = key; 
                 members.push(member);
             });
         }
@@ -47,7 +47,7 @@ function fetchMembersFromFirebase() {
     .catch(error => console.error("መረጃ ከዳታቤዝ ሲመጣ ስህተት ተፈጥሯል:", error));
 }
 
-// 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ (ወደ Firebase ይልካል)
+// 📝 አዲስ አባል መመዝገቢያ እና ማሻሻያ ቅጽ (ሙሉ 6 ክፍሎች)
 function addMember() {
     let name = document.getElementById("mName").value.trim();
     let phone = document.getElementById("mPhone").value.trim();
@@ -64,7 +64,7 @@ function addMember() {
     let qMonth = document.getElementById("qMonth").value;
     let qYear = document.getElementById("qYear").value;
     
-    // ክፍል ፪፡ አድራሻ እና ሥራ
+    // ክፍል ፪
     let job = document.getElementById("mJobStatus").value;
     let loc = document.getElementById("mLoc").value;
     let wereda = document.getElementById("mWereda").value;
@@ -72,13 +72,13 @@ function addMember() {
     let sefer = document.getElementById("mSeferName").value;
     let mapLoc = document.getElementById("mMapLoc").value;
 
-    // ክፍል ፫፡ የሃይማኖት አባት
+    // ክፍል ፫
     let godName = document.getElementById("mGodName").value;
     let godPhone = document.getElementById("mGodPhone").value;
     let edu = document.getElementById("mEdu").value;
     let churchService = document.getElementById("mChurchService").value;
 
-    // ክፍል ፬፡ ድንገተኛ አደጋ
+    // ክፍል ፬
     let famName = document.getElementById("mFamName").value;
     let famChrist = document.getElementById("mFamChrist").value;
     let famPhone = document.getElementById("mFamPhone").value;
@@ -86,7 +86,7 @@ function addMember() {
 
     let notes = document.getElementById("mNotes").value;
     
-    // 👪 ክፍል ፭፡ የቤተሰብ መረጃዎች
+    // ክፍል ፭
     let fatherName = document.getElementById("mFatherName").value.trim();
     let fatherChrist = document.getElementById("mFatherChrist").value.trim();
     let fatherPhone = document.getElementById("mFatherPhone").value.trim();
@@ -139,6 +139,8 @@ function addMember() {
         .then(() => {
             alert("አባል በተሳካ ሁኔታ በዳታቤዝ ውስጥ ተመዝግቧል!");
             fetchMembersFromFirebase();
+            resetForm();
+            goBack();
         });
     } else {
         let firebaseKey = members[editIdx].firebaseKey;
@@ -152,14 +154,13 @@ function addMember() {
             alert("የአባል ማኅደር በዳታቤዝ ላይ በተሳካ ሁኔታ ተሻሽሏል!");
             document.getElementById("editIndex").value = "-1";
             fetchMembersFromFirebase();
+            resetForm();
+            goBack();
         });
     }
-
-    resetForm();
-    goBack();
 }
 
-// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ (ከቀለም እና የ3 ወር አውቶማቲክ ማስጠንቀቂያ ጋር)
+// 📋 የአባላትን ዝርዝር በሰንጠረዥ ማሳያ
 function renderMembers() {
     let tbody = document.getElementById("memberTableBody");
     tbody.innerHTML = "";
@@ -176,13 +177,11 @@ function renderMembers() {
         let warningBadge = "";
         let isDelayed = false;
 
-        // 1. የቁርባን ሁኔታ "በቅዱስ ቁርባን ያለ" ካልተባለ በቀይ ይደምቃል
         if (m.qurbanStatus !== "በቅዱስ ቁርባን ያለ") {
             rowStyle = "background-color: #ffebee; color: #c62828; font-weight: 500; border-bottom: 1px solid #ffcdd2;";
             isDelayed = true;
         }
 
-        // 2. ከ3 ወር (90 ቀን) በላይ የዘገየ ከሆነ ⚠️ ምልክት በራስ ሰር ያደርጋል
         if (m.registrationDate) {
             let regDate = new Date(m.registrationDate);
             let timeDiff = today.getTime() - regDate.getTime();
@@ -276,7 +275,6 @@ function viewProfile(index) {
         editMember(index);
     };
 
-    // 🗑️ የአባል ፋይል መደለቻ አዝራር ክንውን
     document.getElementById("modalDeleteBtn").onclick = function() {
         deleteMember(index);
     };
@@ -340,7 +338,7 @@ function editMember(index) {
     
     document.getElementById("mMotherName").value = fam.motherName && fam.motherName !== "የተመዘገበ የለም" ? fam.motherName : "";
     document.getElementById("mMotherChrist").value = fam.motherChrist && fam.motherChrist !== "የተመዘገበ የለም" ? fam.motherChrist : "";
-    document.getElementById("mMotherPhone").value = fam.motherPhone && fam.motherPhone !== "የተመዘገበ የለም" ? fam.motherPhone : "";
+    document.getElementById("mMotherPhone").value = fam.motherPhone && fam.motherPhone !== "የተመዘገbe የለም" ? fam.motherPhone : "";
     document.getElementById("mMotherJobStatus").value = fam.motherJob || "";
 
     // ክፍል ፮
@@ -351,7 +349,7 @@ function editMember(index) {
     openFolder('newRegistrationFolder');
 }
 
-// 🗑️ ፋይል ለመሰረዝ (Delete Function)
+// 🗑️ የአባል ፋይል መሰረዣ
 function deleteMember(index) {
     let m = members[index];
     if (confirm(`የአባሉን "${m.name}" ሙሉ የቪዲዮ/ማኅደር ፋይል ከዳታቤዝ ላይ ሙሉ በሙሉ መሰረዝ ይፈልጋሉ?`)) {
@@ -367,7 +365,7 @@ function deleteMember(index) {
     }
 }
 
-// 🗓️ በሞዳል ውስጥ የቁርባን ሁኔታን መለወጫ
+// 🗓️ የወርሃዊ ቁርባን ክትትል ማሻሻያ
 function toggleMonthlyQurban() {
     if (currentViewingIndex === -1) return;
     let m = members[currentViewingIndex];
@@ -387,14 +385,11 @@ function toggleMonthlyQurban() {
     });
 }
 
-// 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ)
+// 🧮 የዕድሜ ስሌት (የአሁኑን አመት 2026 መነሻ በማድረግ የተስተካከለ)
 function calculateAge() {
     let yearInput = document.getElementById("birthYear").value;
     if(yearInput) {
-        let gregorianYear = new Date().getFullYear(); 
-        let currentEthiopianYear = gregorianYear - 8; 
-        let age = currentEthiopianYear - parseInt(yearInput);
-        
+        let age = 2026 - parseInt(yearInput); 
         if(age >= 0) {
             document.getElementById("mAge").value = age;
         } else {
@@ -420,7 +415,7 @@ function fetchTsiwaFromFirebase() {
     });
 }
 
-// 📝 አዲስ የፅዋ ዕጣ ለመመዝገብ (የነበረውን ችግር የሚፈታ ፈንክሽን)
+// 📝 አዲስ የፅዋ ዕጣ ለመመዝገብ 
 function addTsiwa() {
     let tName = document.getElementById("tName").value.trim();
     let tMember = document.getElementById("tMember").value.trim();
@@ -452,7 +447,7 @@ function addTsiwa() {
     .catch(error => alert("የፅዋ መረጃ ሲመዘገብ ስህተት ተፈጥሯል፦ " + error));
 }
 
-// 📋 የፅዋ ዕጣዎችን ዝርዝር በሰንጠረዥ ማሳያ
+// 📋 የፅዋ ዕጣዎችን ዝርዝር ማሳያ
 function renderTsiwa() {
     let tbody = document.getElementById("tsiwaTableBody");
     tbody.innerHTML = "";
@@ -486,18 +481,19 @@ function deleteTsiwa(key) {
     }
 }
 
+// 🔄 ፎርሙን ባዶ ማድረጊያ
 function resetForm() {
     document.getElementById("editIndex").value = "-1";
     document.getElementById("mName").value = "";
     document.getElementById("mPhone").value = "";
     document.getElementById("mChrist").value = "";
     document.getElementById("mAge").value = "";
-    document.getElementById("mGender").value = "";
-    document.getElementById("mNationality").value = "ኢትዮጵያዊ";
-    document.getElementById("mBlood").value = "ያልታወቀ";
-    document.getElementById("mQurbanStatus").value = "በቅዱስ ቁርባን ያለ";
+    if(document.getElementById("mGender")) document.getElementById("mGender").value = "";
+    if(document.getElementById("mNationality")) document.getElementById("mNationality").value = "ኢትዮጵያዊ";
+    if(document.getElementById("mBlood")) document.getElementById("mBlood").value = "ያልታወቀ";
+    if(document.getElementById("mQurbanStatus")) document.getElementById("mQurbanStatus").value = "በቅዱስ ቁርባን ያለ";
     
-    document.getElementById("mJobStatus").value = "";
+    if(document.getElementById("mJobStatus")) document.getElementById("mJobStatus").value = "";
     document.getElementById("mLoc").value = "";
     document.getElementById("mWereda").value = "";
     document.getElementById("mHouseNum").value = "";
@@ -517,18 +513,18 @@ function resetForm() {
     document.getElementById("mFatherName").value = "";
     document.getElementById("mFatherChrist").value = "";
     document.getElementById("mFatherPhone").value = "";
-    document.getElementById("mFatherJobStatus").value = "";
+    if(document.getElementById("mFatherJobStatus")) document.getElementById("mFatherJobStatus").value = "";
     document.getElementById("mMotherName").value = "";
     document.getElementById("mMotherChrist").value = "";
     document.getElementById("mMotherPhone").value = "";
-    document.getElementById("mMotherJobStatus").value = "";
+    if(document.getElementById("mMotherJobStatus")) document.getElementById("mMotherJobStatus").value = "";
     
     document.getElementById("mNotes").value = "";
     document.getElementById("formActionTitle").textContent = "📝 የማህበርተኛ መታወቂያ ማውጫ ሙሉ ቅጽ";
     document.getElementById("submitBtn").textContent = "💾 ሙሉ ፋይሉን በፎልደር ውስጥ መዝግብ";
 }
 
-// DOM Loading
+// 🗓️ DOM ሲጭን ቀናትን፣ ወራትንና አመታትን መሙያ
 window.addEventListener('DOMContentLoaded', () => {
     let dSel = document.getElementById('ethDay');
     let mSel = document.getElementById('ethMonth');
@@ -556,13 +552,14 @@ window.addEventListener('DOMContentLoaded', () => {
         if(qMonthSel) qMonthSel.innerHTML += `<option value="${m}">${m}</option>`;
     });
 
-    let currentEthYear = new Date().getFullYear() - 8; 
+    let currentEthYear = 2018; 
 
     if(bySel) {
         bySel.innerHTML = "";
         for(let y=1950; y<=currentEthYear; y++) {
             bySel.innerHTML += `<option value="${y}">${y}</option>`;
         }
+        bySel.value = "2000"; 
     }
 
     if(ySel) {
@@ -570,17 +567,16 @@ window.addEventListener('DOMContentLoaded', () => {
         for(let y=2000; y<=(currentEthYear + 10); y++) {
             ySel.innerHTML += `<option value="${y}">${y}</option>`;
         }
+        ySel.value = currentEthYear.toString();
     }
+
     if(qYearSel) {
         qYearSel.innerHTML = "";
         for(let y=2010; y<=currentEthYear; y++) {
             qYearSel.innerHTML += `<option value="${y}">${y}</option>`;
         }
+        qYearSel.value = currentEthYear.toString();
     }
-
-    if(bySel) bySel.value = "2000"; 
-    if(qYearSel) qYearSel.value = currentEthYear.toString();
-    if(ySel) ySel.value = currentEthYear.toString();
     
     calculateAge(); 
 });
