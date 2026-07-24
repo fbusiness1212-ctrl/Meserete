@@ -510,7 +510,21 @@ function editTsiwa(index) {
     document.getElementById("tsiwaSubmitBtn").textContent = "💾 የተቀየረውን ፅዋ አሻሽል";
     document.getElementById("tsiwaSubmitBtn").style.background = "#ffa000";
 }
-
+// 🗑️ የፅዋ ዕጣ መረጃን ከ Firebase ላይ መሰረዣ Function
+function deleteTsiwa(firebaseKey) {
+    if (confirm("ይህንን የፅዋ ዕጣ መረጃ ሙሉ በሙሉ ከዳታቤዝ ላይ መሰረዝ ይፈልጋሉ?")) {
+        fetch(`${FIREBASE_URL}/tsiwa/${firebaseKey}.json`, {
+            method: "DELETE"
+        })
+        .then(() => {
+            alert("የፅዋ ዕጣ መረጃው በተሳካ ሁኔታ ተሰርዟል!");
+            fetchTsiwaFromFirebase();
+        })
+        .catch(error => {
+            alert("መረጃውን ሲሰረዝ ስህተት አጋጥሟል፦ " + error);
+        });
+    }
+}
 // 🧹 የፅዋ ቅጽን ማጽጃ 
 function clearTsiwaForm() {
     document.getElementById("tsiwaEditKey").value = "";
